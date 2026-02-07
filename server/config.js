@@ -17,6 +17,7 @@ const DEFAULT_STATE = {
     giftedSubMinutes: 5,
     bitsPerMinute: 100,
     donationDollarsPerMinute: 1,
+    targetTimeMs: null, // Target time in milliseconds (null = disabled)
   },
   eventLog: [],
 };

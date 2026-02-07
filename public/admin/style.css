@@ -473,6 +473,47 @@ body {
   letter-spacing: 1px;
 }
 
+/* ── Target Status ───────────────────────────────────────── */
+
+.target-status {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.target-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.target-label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.target-value {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.target-value.boost {
+  color: var(--green);
+}
+
+.target-value.reduce {
+  color: var(--sakura-pink);
+}
+
 /* ── Event Log ───────────────────────────────────────────── */
 
 .log-section {

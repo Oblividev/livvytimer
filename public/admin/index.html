@@ -93,6 +93,42 @@
         </div>
       </section>
 
+      <!-- Target Time -->
+      <section class="card">
+        <h2 class="card-title">Target Time</h2>
+        <p class="card-desc">Set a target time to intelligently adjust time additions. When below target, additions are boosted. When at/above target, additions are reduced.</p>
+        <div class="time-input-row">
+          <div class="time-field">
+            <label for="targetHours">Hours</label>
+            <input type="number" id="targetHours" min="0" max="99" value="0">
+          </div>
+          <div class="time-field">
+            <label for="targetMinutes">Min</label>
+            <input type="number" id="targetMinutes" min="0" max="59" value="0">
+          </div>
+          <div class="time-field">
+            <label for="targetSeconds">Sec</label>
+            <input type="number" id="targetSeconds" min="0" max="59" value="0">
+          </div>
+          <button class="btn btn-set" id="btnSetTarget">Set Target</button>
+          <button class="btn btn-reset" id="btnClearTarget">Clear</button>
+        </div>
+        <div id="targetStatus" class="target-status" style="display: none;">
+          <div class="target-info">
+            <span class="target-label">Target:</span>
+            <span id="targetDisplay" class="target-value">--</span>
+          </div>
+          <div class="target-info">
+            <span class="target-label">Progress:</span>
+            <span id="targetProgress" class="target-value">--</span>
+          </div>
+          <div class="target-info">
+            <span class="target-label">Adjustment:</span>
+            <span id="targetAdjustment" class="target-value">--</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Event Configuration -->
       <section class="card">
         <h2 class="card-title">Event Configuration</h2>

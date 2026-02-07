@@ -35,6 +35,17 @@ const cfgBits = document.getElementById('cfgBits');
 const cfgDonation = document.getElementById('cfgDonation');
 const btnSaveConfig = document.getElementById('btnSaveConfig');
 
+// Target time
+const targetHours = document.getElementById('targetHours');
+const targetMinutes = document.getElementById('targetMinutes');
+const targetSeconds = document.getElementById('targetSeconds');
+const btnSetTarget = document.getElementById('btnSetTarget');
+const btnClearTarget = document.getElementById('btnClearTarget');
+const targetStatus = document.getElementById('targetStatus');
+const targetDisplay = document.getElementById('targetDisplay');
+const targetProgress = document.getElementById('targetProgress');
+const targetAdjustment = document.getElementById('targetAdjustment');
+
 // Connection status
 const twitchDot = document.getElementById('twitchDot');
 const twitchStatusEl = document.getElementById('twitchStatus');
@@ -46,6 +57,7 @@ const eventLog = document.getElementById('eventLog');
 
 // ── State ─────────────────────────────────────────────────
 let currentState = { remainingMs: 0, isRunning: false, isPaused: false };
+let targetTimeMs = null;
 
 // ── Helpers ───────────────────────────────────────────────
 
@@ -105,6 +117,9 @@ function updateTimerDisplay(data) {
     timerStatus.textContent = 'Running';
     timerStatus.className = 'timer-status running';
   }
+
+  // Update target status display
+  updateTargetStatus();
 }
 
 // ── Connection status ─────────────────────────────────────
@@ -144,6 +159,49 @@ function getConfigFromInputs() {
     bitsPerMinute: parseInt(cfgBits.value) || 100,
     donationDollarsPerMinute: parseFloat(cfgDonation.value) || 1,
   };
+}
+
+// ── Target Time ────────────────────────────────────────────────
+
+function calculateTimeAdjustment(currentMs, targetMs) {
+  if (!targetMs || targetMs <= 0) return 1.0;
+  const progress = currentMs / targetMs;
+  if (progress < 0.4) return 2.0 - (progress / 0.4) * 0.8;
+  if (progress < 0.8) return 1.2 - ((progress - 0.4) / 0.4) * 0.2;
+  if (progress < 1.0) return 1.0 - ((progress - 0.8) / 0.2) * 0.5;
+  if (progress < 1.5) return 0.5 - ((progress - 1.0) / 0.5) * 0.25;
+  return 0.25;
+}
+
+function updateTargetStatus() {
+  if (!targetTimeMs || targetTimeMs <= 0) {
+    targetStatus.style.display = 'none';
+    return;
+  }
+
+  targetStatus.style.display = 'block';
+
+  // Display target time
+  const targetTime = formatMs(targetTimeMs);
+  targetDisplay.textContent = `${targetTime.hours}:${targetTime.minutes}:${targetTime.seconds}`;
+
+  // Calculate and display progress
+  const currentMs = currentState.remainingMs;
+  const progress = Math.min(100, (currentMs / targetTimeMs) * 100);
+  targetProgress.textContent = `${progress.toFixed(1)}%`;
+
+  // Calculate and display adjustment multiplier
+  const adjustment = calculateTimeAdjustment(currentMs, targetTimeMs);
+  targetAdjustment.textContent = `${adjustment.toFixed(2)}x`;
+  
+  // Color code the adjustment
+  if (adjustment > 1.0) {
+    targetAdjustment.className = 'target-value boost';
+  } else if (adjustment < 1.0) {
+    targetAdjustment.className = 'target-value reduce';
+  } else {
+    targetAdjustment.className = 'target-value';
+  }
 }
 
 // ── Event log ─────────────────────────────────────────────
@@ -190,6 +248,21 @@ function escapeHtml(str) {
 socket.on('timer:update', updateTimerDisplay);
 socket.on('config:update', populateConfig);
 socket.on('connection:status', updateConnectionStatus);
+
+socket.on('target:update', (data) => {
+  targetTimeMs = data.targetTimeMs || null;
+  if (targetTimeMs) {
+    const time = formatMs(targetTimeMs);
+    targetHours.value = parseInt(time.hours);
+    targetMinutes.value = parseInt(time.minutes);
+    targetSeconds.value = parseInt(time.seconds);
+  } else {
+    targetHours.value = 0;
+    targetMinutes.value = 0;
+    targetSeconds.value = 0;
+  }
+  updateTargetStatus();
+});
 
 socket.on('timer:event', (eventData) => {
   addLogEntry(eventData);
@@ -280,6 +353,25 @@ btnSaveConfig.addEventListener('click', () => {
     btnSaveConfig.textContent = 'Save Configuration';
     btnSaveConfig.classList.remove('saved');
   }, 2000);
+});
+
+// Target time handlers
+btnSetTarget.addEventListener('click', () => {
+  const h = parseInt(targetHours.value) || 0;
+  const m = parseInt(targetMinutes.value) || 0;
+  const s = parseInt(targetSeconds.value) || 0;
+  const ms = ((h * 3600) + (m * 60) + s) * 1000;
+
+  if (ms <= 0) {
+    alert('Please set a target time greater than 0.');
+    return;
+  }
+
+  socket.emit('target:set', { targetTimeMs: ms });
+});
+
+btnClearTarget.addEventListener('click', () => {
+  socket.emit('target:set', { targetTimeMs: null });
 });
 
 // ── Keyboard shortcut: Space to toggle pause ──────────────

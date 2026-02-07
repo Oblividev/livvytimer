@@ -92,6 +92,7 @@ async function subscribeToEvents(sessionId, accessToken, clientId, broadcasterId
 // ── Process incoming events ───────────────────────────────────
 function handleEvent(state, timer, eventType, eventData) {
   const config = state.config;
+  const adjustment = timer.getTimeAdjustment ? timer.getTimeAdjustment() : 1.0;
 
   switch (eventType) {
     case 'channel.subscribe': {
@@ -100,13 +101,17 @@ function handleEvent(state, timer, eventType, eventData) {
       if (tier === '2000') minutes = config.tier2SubMinutes;
       if (tier === '3000') minutes = config.tier3SubMinutes;
 
+      // Apply intelligent adjustment
+      const adjustedMinutes = minutes * adjustment;
+      const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
+
       const userName = eventData.user_name || 'Anonymous';
       timer.addTime(
-        minutes * 60 * 1000,
+        adjustedMs,
         'Subscription',
-        `${userName} (Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'})`
+        `${userName} (Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
       );
-      console.log(`[Twitch] Sub from ${userName} (Tier ${tier}) → +${minutes}min`);
+      console.log(`[Twitch] Sub from ${userName} (Tier ${tier}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       break;
     }
 
@@ -115,12 +120,16 @@ function handleEvent(state, timer, eventType, eventData) {
       const userName = eventData.user_name || 'Anonymous';
       const minutes = config.giftedSubMinutes * total;
 
+      // Apply intelligent adjustment
+      const adjustedMinutes = minutes * adjustment;
+      const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
+
       timer.addTime(
-        minutes * 60 * 1000,
+        adjustedMs,
         'Gifted Subs',
-        `${userName} gifted ${total} sub${total > 1 ? 's' : ''}`
+        `${userName} gifted ${total} sub${total > 1 ? 's' : ''}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
       );
-      console.log(`[Twitch] ${userName} gifted ${total} subs → +${minutes}min`);
+      console.log(`[Twitch] ${userName} gifted ${total} subs → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       break;
     }
 
@@ -130,12 +139,16 @@ function handleEvent(state, timer, eventType, eventData) {
       const minutes = bits / config.bitsPerMinute;
 
       if (minutes > 0) {
+        // Apply intelligent adjustment
+        const adjustedMinutes = minutes * adjustment;
+        const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
+
         timer.addTime(
-          Math.round(minutes * 60 * 1000),
+          adjustedMs,
           'Bits',
-          `${userName} cheered ${bits} bits`
+          `${userName} cheered ${bits} bits${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
         );
-        console.log(`[Twitch] ${userName} cheered ${bits} bits → +${minutes.toFixed(1)}min`);
+        console.log(`[Twitch] ${userName} cheered ${bits} bits → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       }
       break;
     }

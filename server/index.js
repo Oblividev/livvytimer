@@ -56,6 +56,7 @@ io.on('connection', (socket) => {
     isPaused: state.timer.isPaused,
   });
   socket.emit('config:update', state.config);
+  socket.emit('target:update', { targetTimeMs: state.config.targetTimeMs });
   socket.emit('connection:status', connectionStatus);
   socket.emit('eventLog:init', (state.eventLog || []).slice(-50));
 
@@ -106,6 +107,17 @@ io.on('connection', (socket) => {
     const updated = updateConfig(state, newConfig);
     io.emit('config:update', updated);
     console.log('[Config] Updated:', updated);
+  });
+
+  // ── Target time updates ─────────────────────────────────────
+  socket.on('target:set', (data) => {
+    if (data && data.targetTimeMs !== undefined) {
+      const targetMs = data.targetTimeMs === null || data.targetTimeMs === '' ? null : parseInt(data.targetTimeMs);
+      state.config.targetTimeMs = targetMs;
+      updateConfig(state, { targetTimeMs: targetMs });
+      io.emit('target:update', { targetTimeMs: targetMs });
+      console.log('[Target] Set to:', targetMs ? `${Math.floor(targetMs / 60000)}min` : 'disabled');
+    }
   });
 
   socket.on('disconnect', () => {

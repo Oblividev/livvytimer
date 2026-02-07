@@ -56,6 +56,7 @@ function connectStreamlabs(state, timer, setStatus) {
 
 function handleDonation(state, timer, eventData) {
   const config = state.config;
+  const adjustment = timer.getTimeAdjustment ? timer.getTimeAdjustment() : 1.0;
 
   if (!eventData.message || !Array.isArray(eventData.message)) return;
 
@@ -71,12 +72,16 @@ function handleDonation(state, timer, eventData) {
     // donationDollarsPerMinute = how many dollars per 1 minute of time
     const minutes = amount / config.donationDollarsPerMinute;
 
+    // Apply intelligent adjustment
+    const adjustedMinutes = minutes * adjustment;
+    const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
+
     timer.addTime(
-      Math.round(minutes * 60 * 1000),
+      adjustedMs,
       'Donation',
-      `${name} donated ${formattedAmount}`
+      `${name} donated ${formattedAmount}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
     );
-    console.log(`[Streamlabs] ${name} donated ${formattedAmount} → +${minutes.toFixed(1)}min`);
+    console.log(`[Streamlabs] ${name} donated ${formattedAmount} → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
   }
 }
 
