@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livvy Timer - Subathon Overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Sakura petals (ambient drift) -->
+  <div class="petals-container" id="petalsContainer"></div>
+
+  <!-- Burst petals (event triggered) -->
+  <div class="burst-container" id="burstContainer"></div>
+
+  <!-- Event notification -->
+  <div class="event-toast" id="eventToast">
+    <span class="event-toast-amount" id="eventAmount">+5:00</span>
+    <span class="event-toast-label" id="eventLabel">New Sub!</span>
+  </div>
+
+  <!-- Main timer card -->
+  <div class="timer-card" id="timerCard">
+    <!-- Decorative sakura branch SVG -->
+    <svg class="sakura-branch" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 40 Q20 35 40 25 Q55 18 70 22 Q85 26 95 18" stroke="var(--sakura-blue)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+      <path d="M40 25 Q45 15 50 20" stroke="var(--sakura-blue)" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.4"/>
+      <path d="M65 20 Q68 12 72 18" stroke="var(--sakura-blue)" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.4"/>
+      <!-- Blossoms -->
+      <g class="blossom blossom-1" transform="translate(42, 20)">
+        <circle cx="0" cy="-4" r="3" fill="var(--sakura-blue)" opacity="0.6"/>
+        <circle cx="3.8" cy="-1.2" r="3" fill="var(--sakura-blue)" opacity="0.5"/>
+        <circle cx="2.4" cy="3.2" r="3" fill="var(--sakura-blue)" opacity="0.6"/>
+        <circle cx="-2.4" cy="3.2" r="3" fill="var(--sakura-blue)" opacity="0.5"/>
+        <circle cx="-3.8" cy="-1.2" r="3" fill="var(--sakura-blue)" opacity="0.6"/>
+        <circle cx="0" cy="0" r="2" fill="var(--sakura-pink)" opacity="0.7"/>
+      </g>
+      <g class="blossom blossom-2" transform="translate(72, 16)">
+        <circle cx="0" cy="-3.5" r="2.5" fill="var(--sakura-blue)" opacity="0.5"/>
+        <circle cx="3.3" cy="-1" r="2.5" fill="var(--sakura-blue)" opacity="0.4"/>
+        <circle cx="2" cy="2.8" r="2.5" fill="var(--sakura-blue)" opacity="0.5"/>
+        <circle cx="-2" cy="2.8" r="2.5" fill="var(--sakura-blue)" opacity="0.4"/>
+        <circle cx="-3.3" cy="-1" r="2.5" fill="var(--sakura-blue)" opacity="0.5"/>
+        <circle cx="0" cy="0" r="1.8" fill="var(--sakura-pink)" opacity="0.6"/>
+      </g>
+      <g class="blossom blossom-3" transform="translate(95, 15)">
+        <circle cx="0" cy="-3" r="2" fill="var(--sakura-blue)" opacity="0.4"/>
+        <circle cx="2.8" cy="-0.9" r="2" fill="var(--sakura-blue)" opacity="0.35"/>
+        <circle cx="1.7" cy="2.4" r="2" fill="var(--sakura-blue)" opacity="0.4"/>
+        <circle cx="-1.7" cy="2.4" r="2" fill="var(--sakura-blue)" opacity="0.35"/>
+        <circle cx="-2.8" cy="-0.9" r="2" fill="var(--sakura-blue)" opacity="0.4"/>
+        <circle cx="0" cy="0" r="1.5" fill="var(--sakura-pink)" opacity="0.5"/>
+      </g>
+    </svg>
+
+    <!-- Anniversary badge -->
+    <div class="anniversary-badge">
+      <svg class="badge-flower" viewBox="0 0 16 16" width="14" height="14">
+        <circle cx="8" cy="5" r="3" fill="var(--sakura-pink)" opacity="0.8"/>
+        <circle cx="10.8" cy="7" r="3" fill="var(--sakura-pink)" opacity="0.7"/>
+        <circle cx="9.7" cy="10.3" r="3" fill="var(--sakura-pink)" opacity="0.8"/>
+        <circle cx="6.3" cy="10.3" r="3" fill="var(--sakura-pink)" opacity="0.7"/>
+        <circle cx="5.2" cy="7" r="3" fill="var(--sakura-pink)" opacity="0.8"/>
+        <circle cx="8" cy="8" r="2" fill="var(--warm-cream)" opacity="0.9"/>
+      </svg>
+      <span>5th Anniversary Subathon</span>
+      <svg class="badge-flower" viewBox="0 0 16 16" width="14" height="14">
+        <circle cx="8" cy="5" r="3" fill="var(--sakura-pink)" opacity="0.8"/>
+        <circle cx="10.8" cy="7" r="3" fill="var(--sakura-pink)" opacity="0.7"/>
+        <circle cx="9.7" cy="10.3" r="3" fill="var(--sakura-pink)" opacity="0.8"/>
+        <circle cx="6.3" cy="10.3" r="3" fill="var(--sakura-pink)" opacity="0.7"/>
+        <circle cx="5.2" cy="7" r="3" fill="var(--sakura-pink)" opacity="0.8"/>
+        <circle cx="8" cy="8" r="2" fill="var(--warm-cream)" opacity="0.9"/>
+      </svg>
+    </div>
+
+    <!-- Countdown display -->
+    <div class="countdown" id="countdown">
+      <span class="digit-group" id="hours">00</span>
+      <span class="separator">:</span>
+      <span class="digit-group" id="minutes">00</span>
+      <span class="separator">:</span>
+      <span class="digit-group" id="seconds">00</span>
+    </div>
+
+    <!-- Paused overlay -->
+    <div class="paused-overlay" id="pausedOverlay">
+      <span>PAUSED</span>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "livvytimer",
+  "version": "1.0.0",
+  "description": "Subathon timer for ObliviosaOfficial's 5th Twitch Anniversary",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "keywords": ["subathon", "twitch", "timer", "obs"],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livvy Timer - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="admin-shell">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="header-brand">
+        <svg class="header-flower" viewBox="0 0 20 20" width="22" height="22">
+          <circle cx="10" cy="6" r="4" fill="#FFB7C5" opacity="0.8"/>
+          <circle cx="13.8" cy="8.5" r="4" fill="#FFB7C5" opacity="0.7"/>
+          <circle cx="12.4" cy="12.8" r="4" fill="#FFB7C5" opacity="0.8"/>
+          <circle cx="7.6" cy="12.8" r="4" fill="#FFB7C5" opacity="0.7"/>
+          <circle cx="6.2" cy="8.5" r="4" fill="#FFB7C5" opacity="0.8"/>
+          <circle cx="10" cy="10" r="2.5" fill="#FFF8F0" opacity="0.9"/>
+        </svg>
+        <h1>Livvy Timer</h1>
+        <span class="header-badge">Admin</span>
+      </div>
+      <div class="header-connections">
+        <span class="conn-dot" id="twitchDot"></span>
+        <span class="conn-label">Twitch: <strong id="twitchStatus">--</strong></span>
+        <span class="conn-dot" id="streamlabsDot"></span>
+        <span class="conn-label">Streamlabs: <strong id="streamlabsStatus">--</strong></span>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="admin-grid">
+
+      <!-- Timer Display & Controls -->
+      <section class="card timer-section">
+        <h2 class="card-title">Timer</h2>
+        <div class="timer-display" id="timerDisplay">
+          <span id="adminHours">00</span>
+          <span class="timer-sep">:</span>
+          <span id="adminMinutes">00</span>
+          <span class="timer-sep">:</span>
+          <span id="adminSeconds">00</span>
+        </div>
+        <div class="timer-status" id="timerStatus">Idle</div>
+        <div class="btn-row">
+          <button class="btn btn-start" id="btnStart">Start</button>
+          <button class="btn btn-pause" id="btnPause">Pause</button>
+          <button class="btn btn-resume" id="btnResume">Resume</button>
+          <button class="btn btn-stop" id="btnStop">Stop</button>
+          <button class="btn btn-reset" id="btnReset">Reset</button>
+        </div>
+      </section>
+
+      <!-- Set Time -->
+      <section class="card">
+        <h2 class="card-title">Set Initial Time</h2>
+        <div class="time-input-row">
+          <div class="time-field">
+            <label for="setHours">Hours</label>
+            <input type="number" id="setHours" min="0" max="99" value="0">
+          </div>
+          <div class="time-field">
+            <label for="setMinutes">Min</label>
+            <input type="number" id="setMinutes" min="0" max="59" value="0">
+          </div>
+          <div class="time-field">
+            <label for="setSeconds">Sec</label>
+            <input type="number" id="setSeconds" min="0" max="59" value="0">
+          </div>
+          <button class="btn btn-set" id="btnSetTime">Set &amp; Start</button>
+        </div>
+
+        <h3 class="card-subtitle">Quick Add / Remove</h3>
+        <div class="btn-row">
+          <button class="btn btn-add" data-ms="60000">+1 min</button>
+          <button class="btn btn-add" data-ms="300000">+5 min</button>
+          <button class="btn btn-add" data-ms="600000">+10 min</button>
+          <button class="btn btn-add" data-ms="1800000">+30 min</button>
+          <button class="btn btn-add" data-ms="3600000">+1 hr</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-remove" data-ms="60000">-1 min</button>
+          <button class="btn btn-remove" data-ms="300000">-5 min</button>
+          <button class="btn btn-remove" data-ms="600000">-10 min</button>
+          <button class="btn btn-remove" data-ms="1800000">-30 min</button>
+          <button class="btn btn-remove" data-ms="3600000">-1 hr</button>
+        </div>
+      </section>
+
+      <!-- Event Configuration -->
+      <section class="card">
+        <h2 class="card-title">Event Configuration</h2>
+        <p class="card-desc">How much time each event adds to the timer.</p>
+        <div class="config-grid">
+          <div class="config-item">
+            <label for="cfgTier1">Tier 1 Sub</label>
+            <div class="config-input">
+              <input type="number" id="cfgTier1" min="0" step="0.5" value="5">
+              <span>min</span>
+            </div>
+          </div>
+          <div class="config-item">
+            <label for="cfgTier2">Tier 2 Sub</label>
+            <div class="config-input">
+              <input type="number" id="cfgTier2" min="0" step="0.5" value="10">
+              <span>min</span>
+            </div>
+          </div>
+          <div class="config-item">
+            <label for="cfgTier3">Tier 3 Sub</label>
+            <div class="config-input">
+              <input type="number" id="cfgTier3" min="0" step="0.5" value="25">
+              <span>min</span>
+            </div>
+          </div>
+          <div class="config-item">
+            <label for="cfgGifted">Gifted Sub (each)</label>
+            <div class="config-input">
+              <input type="number" id="cfgGifted" min="0" step="0.5" value="5">
+              <span>min</span>
+            </div>
+          </div>
+          <div class="config-item">
+            <label for="cfgBits">Bits per 1 min</label>
+            <div class="config-input">
+              <input type="number" id="cfgBits" min="1" step="1" value="100">
+              <span>bits</span>
+            </div>
+          </div>
+          <div class="config-item">
+            <label for="cfgDonation">$ per 1 min</label>
+            <div class="config-input">
+              <input type="number" id="cfgDonation" min="0.01" step="0.01" value="1">
+              <span>USD</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-save" id="btnSaveConfig">Save Configuration</button>
+      </section>
+
+      <!-- Event Log -->
+      <section class="card log-section">
+        <h2 class="card-title">Event Log</h2>
+        <div class="event-log" id="eventLog">
+          <div class="log-empty">No events yet. Events will appear here in real time.</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

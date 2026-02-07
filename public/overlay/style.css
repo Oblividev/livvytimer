@@ -1,0 +1,451 @@
+/* ═══════════════════════════════════════════════════════════
+   Sakura Anniversary — OBS Overlay
+   ObliviosaOfficial 5th Anniversary Subathon Timer
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --sakura-blue: #7EC8E3;
+  --sakura-blue-dim: #5BA8C8;
+  --sakura-pink: #FFB7C5;
+  --sakura-pink-hot: #FF8FA3;
+  --soft-lavender: #C5B8D9;
+  --warm-cream: #FFF8F0;
+  --frost-white: rgba(255, 255, 255, 0.10);
+  --frost-border: rgba(126, 200, 227, 0.25);
+  --glow-cyan: #A8E4F0;
+  --glow-pink: #FFD0DC;
+  --pixel-shadow: #2A1B3D;
+  --card-shadow: rgba(42, 27, 61, 0.25);
+}
+
+/* ── Reset & Canvas ──────────────────────────────────────── */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: 'Zen Maru Gothic', sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Timer Card ──────────────────────────────────────────── */
+
+.timer-card {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(126, 200, 227, 0.08) 0%,
+    rgba(197, 184, 217, 0.10) 50%,
+    rgba(255, 183, 197, 0.08) 100%
+  );
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--frost-border);
+  border-radius: 20px;
+  padding: 18px 40px 22px;
+  min-width: 360px;
+  text-align: center;
+  box-shadow:
+    0 4px 30px var(--card-shadow),
+    0 0 60px rgba(126, 200, 227, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  animation: cardFloat 6s ease-in-out infinite;
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* ── Sakura Branch Decoration ────────────────────────────── */
+
+.sakura-branch {
+  position: absolute;
+  top: -2px;
+  left: -4px;
+  width: 130px;
+  height: auto;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.blossom-1 { animation: blossomPulse 4s ease-in-out infinite; }
+.blossom-2 { animation: blossomPulse 4s ease-in-out 1.3s infinite; }
+.blossom-3 { animation: blossomPulse 4s ease-in-out 2.6s infinite; }
+
+@keyframes blossomPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.08); }
+}
+
+/* ── Anniversary Badge ───────────────────────────────────── */
+
+.anniversary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(126, 200, 227, 0.15),
+    rgba(255, 183, 197, 0.18),
+    rgba(197, 184, 217, 0.15)
+  );
+  border: 1px solid rgba(255, 183, 197, 0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  margin-bottom: 8px;
+  font-family: 'DotGothic16', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--sakura-pink);
+  text-shadow: 0 0 12px rgba(255, 183, 197, 0.5);
+  animation: badgeGlow 3s ease-in-out infinite;
+}
+
+.badge-flower {
+  flex-shrink: 0;
+  animation: flowerSpin 12s linear infinite;
+}
+
+.badge-flower:last-child {
+  animation-direction: reverse;
+}
+
+@keyframes flowerSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes badgeGlow {
+  0%, 100% { text-shadow: 0 0 12px rgba(255, 183, 197, 0.5); }
+  50% { text-shadow: 0 0 20px rgba(255, 183, 197, 0.7), 0 0 40px rgba(126, 200, 227, 0.3); }
+}
+
+/* ── Countdown Display ───────────────────────────────────── */
+
+.countdown {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  user-select: none;
+}
+
+.digit-group {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 900;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--warm-cream);
+  text-shadow:
+    0 0 20px rgba(168, 228, 240, 0.6),
+    0 0 40px rgba(168, 228, 240, 0.3),
+    0 2px 4px var(--card-shadow);
+  min-width: 85px;
+  display: inline-block;
+  text-align: center;
+  animation: digitGlow 3s ease-in-out infinite;
+  transition: color 0.5s ease, text-shadow 0.5s ease;
+}
+
+.separator {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 52px;
+  color: var(--sakura-blue);
+  opacity: 0.7;
+  text-shadow: 0 0 15px rgba(126, 200, 227, 0.5);
+  animation: separatorPulse 1s steps(2, start) infinite;
+  position: relative;
+  top: -3px;
+}
+
+@keyframes digitGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 20px rgba(168, 228, 240, 0.6),
+      0 0 40px rgba(168, 228, 240, 0.3),
+      0 2px 4px var(--card-shadow);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(168, 228, 240, 0.8),
+      0 0 50px rgba(168, 228, 240, 0.4),
+      0 0 80px rgba(126, 200, 227, 0.15),
+      0 2px 4px var(--card-shadow);
+  }
+}
+
+@keyframes separatorPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.3; }
+}
+
+/* ── Critical State (< 5 min) ────────────────────────────── */
+
+.timer-card.critical .digit-group {
+  color: var(--sakura-pink);
+  text-shadow:
+    0 0 20px rgba(255, 143, 163, 0.7),
+    0 0 40px rgba(255, 143, 163, 0.4),
+    0 2px 4px var(--card-shadow);
+  animation: criticalPulse 0.8s ease-in-out infinite;
+}
+
+.timer-card.critical .separator {
+  color: var(--sakura-pink);
+  text-shadow: 0 0 15px rgba(255, 143, 163, 0.5);
+}
+
+.timer-card.critical {
+  border-color: rgba(255, 143, 163, 0.4);
+  animation: criticalShake 0.4s ease-in-out infinite, cardFloat 6s ease-in-out infinite;
+}
+
+@keyframes criticalPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 20px rgba(255, 143, 163, 0.7),
+      0 0 40px rgba(255, 143, 163, 0.4),
+      0 2px 4px var(--card-shadow);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(255, 143, 163, 0.9),
+      0 0 60px rgba(255, 143, 163, 0.5),
+      0 0 90px rgba(255, 183, 197, 0.2),
+      0 2px 4px var(--card-shadow);
+  }
+}
+
+@keyframes criticalShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+/* ── Paused Overlay ──────────────────────────────────────── */
+
+.paused-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(42, 27, 61, 0.3);
+  backdrop-filter: blur(2px);
+  border-radius: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.paused-overlay span {
+  font-family: 'DotGothic16', monospace;
+  font-size: 22px;
+  letter-spacing: 6px;
+  color: var(--soft-lavender);
+  text-shadow: 0 0 20px rgba(197, 184, 217, 0.6);
+  animation: pausedBlink 2s ease-in-out infinite;
+}
+
+.paused-overlay.visible {
+  opacity: 1;
+}
+
+@keyframes pausedBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Ambient Sakura Petals ───────────────────────────────── */
+
+.petals-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.petal {
+  position: absolute;
+  width: 12px;
+  height: 10px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.petal svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes petalDrift {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(0px) rotate(0deg) scale(0.8);
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(calc(100vh + 20px)) translateX(var(--drift-x, 40px)) rotate(var(--drift-rot, 360deg)) scale(0.6);
+  }
+}
+
+.petal.drifting {
+  animation: petalDrift var(--drift-duration, 8s) var(--drift-delay, 0s) linear infinite;
+}
+
+/* ── Burst Petals (Event) ────────────────────────────────── */
+
+.burst-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.burst-petal {
+  position: absolute;
+  top: -10px;
+  width: 14px;
+  height: 12px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.burst-petal svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes burstFall {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+  }
+  8% {
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(calc(100vh + 40px)) translateX(var(--burst-x, 30px)) rotate(var(--burst-rot, 540deg)) scale(0.4);
+  }
+}
+
+.burst-petal.falling {
+  animation: burstFall var(--burst-duration, 3s) var(--burst-delay, 0s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ── Event Toast ─────────────────────────────────────────── */
+
+.event-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+}
+
+.event-toast.show {
+  animation: toastShow 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.event-toast-amount {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 900;
+  font-size: 36px;
+  color: var(--sakura-pink);
+  text-shadow:
+    0 0 20px rgba(255, 183, 197, 0.8),
+    0 0 40px rgba(255, 183, 197, 0.4),
+    0 2px 6px var(--card-shadow);
+}
+
+.event-toast-label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--glow-cyan);
+  text-shadow: 0 0 12px rgba(168, 228, 240, 0.6);
+}
+
+@keyframes toastShow {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.5);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  25% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(0.9);
+  }
+}
+
+/* ── Expired State ───────────────────────────────────────── */
+
+.timer-card.expired .digit-group {
+  opacity: 0.4;
+  animation: none;
+}
+
+.timer-card.expired .separator {
+  animation: none;
+  opacity: 0.3;
+}
+
+.timer-card.expired {
+  animation: none;
+  border-color: rgba(197, 184, 217, 0.2);
+}
+
+/* ── Idle / Not Running State ────────────────────────────── */
+
+.timer-card.idle .digit-group {
+  opacity: 0.5;
+}
+
+.timer-card.idle .separator {
+  animation: none;
+  opacity: 0.3;
+}

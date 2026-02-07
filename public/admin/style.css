@@ -1,0 +1,600 @@
+/* ═══════════════════════════════════════════════════════════
+   Livvy Timer Admin — Sakura Theme
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --sakura-blue: #7EC8E3;
+  --sakura-pink: #FFB7C5;
+  --sakura-pink-hot: #FF8FA3;
+  --soft-lavender: #C5B8D9;
+  --warm-cream: #FFF8F0;
+
+  --bg-deep: #1A1225;
+  --bg-card: #231A32;
+  --bg-card-hover: #2A2040;
+  --bg-input: #1A1225;
+  --border-subtle: rgba(126, 200, 227, 0.15);
+  --border-focus: rgba(126, 200, 227, 0.4);
+  --text-primary: #EDE6F5;
+  --text-secondary: #9B8FB5;
+  --text-dim: #6B5F80;
+
+  --green: #7EDDA9;
+  --red: #FF8A8A;
+  --yellow: #FFD88A;
+  --orange: #FFB07A;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 15px;
+}
+
+body {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── Admin Shell ─────────────────────────────────────────── */
+
+.admin-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 24px;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-brand h1 {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--warm-cream);
+}
+
+.header-badge {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--sakura-pink);
+  background: rgba(255, 183, 197, 0.1);
+  border: 1px solid rgba(255, 183, 197, 0.25);
+  border-radius: 10px;
+  padding: 2px 10px;
+}
+
+.header-flower {
+  flex-shrink: 0;
+  animation: headerFlowerSpin 20s linear infinite;
+}
+
+@keyframes headerFlowerSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.header-connections {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  margin-left: 10px;
+  flex-shrink: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.conn-dot:first-child {
+  margin-left: 0;
+}
+
+.conn-dot.connected {
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(126, 221, 169, 0.6);
+}
+
+.conn-dot.connecting {
+  background: var(--yellow);
+  box-shadow: 0 0 8px rgba(255, 216, 138, 0.5);
+  animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+.conn-dot.error,
+.conn-dot.disconnected {
+  background: var(--red);
+  box-shadow: 0 0 8px rgba(255, 138, 138, 0.4);
+}
+
+.conn-dot.not_configured {
+  background: var(--text-dim);
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.conn-label strong {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ── Grid Layout ─────────────────────────────────────────── */
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(126, 200, 227, 0.25);
+}
+
+.card-title {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--sakura-blue);
+  margin-bottom: 16px;
+}
+
+.card-subtitle {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--soft-lavender);
+  margin: 16px 0 10px;
+}
+
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: -8px 0 16px;
+}
+
+/* ── Timer Section ───────────────────────────────────────── */
+
+.timer-section {
+  text-align: center;
+}
+
+.timer-display {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 900;
+  font-size: 3.5rem;
+  color: var(--warm-cream);
+  text-shadow: 0 0 20px rgba(168, 228, 240, 0.4);
+  margin: 8px 0;
+  letter-spacing: 2px;
+  user-select: none;
+}
+
+.timer-display.critical {
+  color: var(--sakura-pink-hot);
+  text-shadow: 0 0 20px rgba(255, 143, 163, 0.5);
+}
+
+.timer-display.paused {
+  opacity: 0.5;
+}
+
+.timer-sep {
+  color: var(--sakura-blue);
+  opacity: 0.5;
+  margin: 0 2px;
+}
+
+.timer-status {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.timer-status.running {
+  color: var(--green);
+}
+
+.timer-status.paused {
+  color: var(--yellow);
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 8px 18px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-start {
+  border-color: rgba(126, 221, 169, 0.3);
+  color: var(--green);
+}
+.btn-start:hover {
+  background: rgba(126, 221, 169, 0.08);
+  border-color: rgba(126, 221, 169, 0.5);
+}
+
+.btn-pause {
+  border-color: rgba(255, 216, 138, 0.3);
+  color: var(--yellow);
+}
+.btn-pause:hover {
+  background: rgba(255, 216, 138, 0.08);
+  border-color: rgba(255, 216, 138, 0.5);
+}
+
+.btn-resume {
+  border-color: rgba(126, 200, 227, 0.3);
+  color: var(--sakura-blue);
+}
+.btn-resume:hover {
+  background: rgba(126, 200, 227, 0.08);
+  border-color: rgba(126, 200, 227, 0.5);
+}
+
+.btn-stop {
+  border-color: rgba(255, 138, 138, 0.3);
+  color: var(--red);
+}
+.btn-stop:hover {
+  background: rgba(255, 138, 138, 0.08);
+  border-color: rgba(255, 138, 138, 0.5);
+}
+
+.btn-reset {
+  border-color: rgba(197, 184, 217, 0.3);
+  color: var(--soft-lavender);
+}
+.btn-reset:hover {
+  background: rgba(197, 184, 217, 0.08);
+  border-color: rgba(197, 184, 217, 0.5);
+}
+
+.btn-set {
+  border-color: rgba(126, 221, 169, 0.3);
+  color: var(--green);
+  white-space: nowrap;
+}
+.btn-set:hover {
+  background: rgba(126, 221, 169, 0.08);
+  border-color: rgba(126, 221, 169, 0.5);
+}
+
+.btn-add {
+  border-color: rgba(126, 200, 227, 0.3);
+  color: var(--sakura-blue);
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+.btn-add:hover {
+  background: rgba(126, 200, 227, 0.08);
+  border-color: rgba(126, 200, 227, 0.5);
+}
+
+.btn-remove {
+  border-color: rgba(255, 183, 197, 0.3);
+  color: var(--sakura-pink);
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+.btn-remove:hover {
+  background: rgba(255, 183, 197, 0.08);
+  border-color: rgba(255, 183, 197, 0.5);
+}
+
+.btn-save {
+  border-color: rgba(126, 200, 227, 0.3);
+  color: var(--sakura-blue);
+  margin-top: 16px;
+  width: 100%;
+}
+.btn-save:hover {
+  background: rgba(126, 200, 227, 0.08);
+  border-color: rgba(126, 200, 227, 0.5);
+}
+
+.btn-save.saved {
+  border-color: rgba(126, 221, 169, 0.5);
+  color: var(--green);
+}
+
+/* ── Time Input Row ──────────────────────────────────────── */
+
+.time-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.time-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-field label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.time-field input {
+  width: 70px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-align: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 8px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.time-field input:focus {
+  border-color: var(--border-focus);
+}
+
+/* ── Config Grid ─────────────────────────────────────────── */
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.config-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.config-item label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.config-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.config-input input {
+  width: 60px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 5px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.config-input input:focus {
+  border-color: var(--border-focus);
+}
+
+.config-input span {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Event Log ───────────────────────────────────────────── */
+
+.log-section {
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-log {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  padding-right: 4px;
+}
+
+.event-log::-webkit-scrollbar {
+  width: 4px;
+}
+
+.event-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.event-log::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 2px;
+}
+
+.log-empty {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 20px;
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 8px 12px;
+  animation: logSlideIn 0.3s ease-out;
+}
+
+@keyframes logSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.log-time-added {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  min-width: 65px;
+  text-align: right;
+}
+
+.log-time-added.add {
+  color: var(--sakura-blue);
+}
+
+.log-time-added.remove {
+  color: var(--sakura-pink);
+}
+
+.log-detail {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.log-source {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--soft-lavender);
+  background: rgba(197, 184, 217, 0.1);
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.log-timestamp {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .timer-display {
+    font-size: 2.5rem;
+  }
+
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .time-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .time-field input {
+    width: 100%;
+  }
+}
