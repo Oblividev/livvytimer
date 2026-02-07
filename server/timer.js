@@ -145,12 +145,31 @@ function createTimer(state, io) {
 
   function addTime(ms, source, detail) {
     const wasZero = state.timer.remainingMs <= 0;
-    state.timer.remainingMs = Math.max(0, state.timer.remainingMs + ms);
+    const oldTime = state.timer.remainingMs;
+    let newTime = oldTime + ms;
+    
+    // Enforce hard cap if set
+    const hardCap = state.config.hardCapMs;
+    let wasCapped = false;
+    if (hardCap && hardCap > 0 && newTime > hardCap) {
+      newTime = hardCap;
+      wasCapped = true;
+      // If we hit the cap, add a note to the detail
+      if (ms > 0 && detail && !detail.includes('[Capped]')) {
+        detail += ' [Capped]';
+      }
+    }
+    
+    state.timer.remainingMs = Math.max(0, newTime);
+    
+    // Calculate actual time added (may be less than requested if capped)
+    const actualMsAdded = state.timer.remainingMs - oldTime;
+    const eventMs = Math.abs(actualMsAdded);
 
     const eventEntry = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       type: ms > 0 ? 'add' : 'remove',
-      ms: Math.abs(ms),
+      ms: eventMs,
       source: source || 'Unknown',
       detail: detail || '',
       timestamp: Date.now(),

@@ -46,6 +46,16 @@ const targetDisplay = document.getElementById('targetDisplay');
 const targetProgress = document.getElementById('targetProgress');
 const targetAdjustment = document.getElementById('targetAdjustment');
 
+// Hard cap
+const capHours = document.getElementById('capHours');
+const capMinutes = document.getElementById('capMinutes');
+const capSeconds = document.getElementById('capSeconds');
+const btnSetCap = document.getElementById('btnSetCap');
+const btnClearCap = document.getElementById('btnClearCap');
+const capStatus = document.getElementById('capStatus');
+const capDisplay = document.getElementById('capDisplay');
+const capStatusText = document.getElementById('capStatusText');
+
 // Connection status
 const twitchDot = document.getElementById('twitchDot');
 const twitchStatusEl = document.getElementById('twitchStatus');
@@ -58,6 +68,7 @@ const eventLog = document.getElementById('eventLog');
 // ── State ─────────────────────────────────────────────────
 let currentState = { remainingMs: 0, isRunning: false, isPaused: false };
 let targetTimeMs = null;
+let hardCapMs = null;
 
 // ── Helpers ───────────────────────────────────────────────
 
@@ -120,6 +131,7 @@ function updateTimerDisplay(data) {
 
   // Update target status display
   updateTargetStatus();
+  updateCapStatus();
 }
 
 // ── Connection status ─────────────────────────────────────
@@ -204,6 +216,38 @@ function updateTargetStatus() {
   }
 }
 
+function updateCapStatus() {
+  if (!hardCapMs || hardCapMs <= 0) {
+    capStatus.style.display = 'none';
+    return;
+  }
+
+  capStatus.style.display = 'block';
+
+  // Display cap time
+  const capTime = formatMs(hardCapMs);
+  capDisplay.textContent = `${capTime.hours}:${capTime.minutes}:${capTime.seconds}`;
+
+  // Check if timer is at or near cap
+  const currentMs = currentState.remainingMs;
+  const remainingToCap = hardCapMs - currentMs;
+  const percentToCap = (currentMs / hardCapMs) * 100;
+
+  if (remainingToCap <= 0) {
+    capStatusText.textContent = 'AT CAP';
+    capStatusText.className = 'target-value reduce';
+  } else if (remainingToCap < 60000) { // Less than 1 minute
+    capStatusText.textContent = 'Near Cap';
+    capStatusText.className = 'target-value reduce';
+  } else if (percentToCap >= 90) {
+    capStatusText.textContent = `${percentToCap.toFixed(0)}% Full`;
+    capStatusText.className = 'target-value reduce';
+  } else {
+    capStatusText.textContent = 'Active';
+    capStatusText.className = 'target-value';
+  }
+}
+
 // ── Event log ─────────────────────────────────────────────
 
 function clearLogEmpty() {
@@ -262,6 +306,21 @@ socket.on('target:update', (data) => {
     targetSeconds.value = 0;
   }
   updateTargetStatus();
+});
+
+socket.on('hardcap:update', (data) => {
+  hardCapMs = data.hardCapMs || null;
+  if (hardCapMs) {
+    const time = formatMs(hardCapMs);
+    capHours.value = parseInt(time.hours);
+    capMinutes.value = parseInt(time.minutes);
+    capSeconds.value = parseInt(time.seconds);
+  } else {
+    capHours.value = 0;
+    capMinutes.value = 0;
+    capSeconds.value = 0;
+  }
+  updateCapStatus();
 });
 
 socket.on('timer:event', (eventData) => {
@@ -372,6 +431,25 @@ btnSetTarget.addEventListener('click', () => {
 
 btnClearTarget.addEventListener('click', () => {
   socket.emit('target:set', { targetTimeMs: null });
+});
+
+// Hard cap handlers
+btnSetCap.addEventListener('click', () => {
+  const h = parseInt(capHours.value) || 0;
+  const m = parseInt(capMinutes.value) || 0;
+  const s = parseInt(capSeconds.value) || 0;
+  const ms = ((h * 3600) + (m * 60) + s) * 1000;
+
+  if (ms <= 0) {
+    alert('Please set a hard cap greater than 0.');
+    return;
+  }
+
+  socket.emit('hardcap:set', { hardCapMs: ms });
+});
+
+btnClearCap.addEventListener('click', () => {
+  socket.emit('hardcap:set', { hardCapMs: null });
 });
 
 // ── Keyboard shortcut: Space to toggle pause ──────────────

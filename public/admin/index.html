@@ -129,6 +129,38 @@
         </div>
       </section>
 
+      <!-- Hard Cap -->
+      <section class="card">
+        <h2 class="card-title">Hard Cap</h2>
+        <p class="card-desc">Set a maximum time limit. The timer will never exceed this value, even if events add more time.</p>
+        <div class="time-input-row">
+          <div class="time-field">
+            <label for="capHours">Hours</label>
+            <input type="number" id="capHours" min="0" max="99" value="0">
+          </div>
+          <div class="time-field">
+            <label for="capMinutes">Min</label>
+            <input type="number" id="capMinutes" min="0" max="59" value="0">
+          </div>
+          <div class="time-field">
+            <label for="capSeconds">Sec</label>
+            <input type="number" id="capSeconds" min="0" max="59" value="0">
+          </div>
+          <button class="btn btn-set" id="btnSetCap">Set Cap</button>
+          <button class="btn btn-reset" id="btnClearCap">Clear</button>
+        </div>
+        <div id="capStatus" class="target-status" style="display: none;">
+          <div class="target-info">
+            <span class="target-label">Hard Cap:</span>
+            <span id="capDisplay" class="target-value">--</span>
+          </div>
+          <div class="target-info">
+            <span class="target-label">Status:</span>
+            <span id="capStatusText" class="target-value">--</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Event Configuration -->
       <section class="card">
         <h2 class="card-title">Event Configuration</h2>

@@ -18,6 +18,7 @@ const DEFAULT_STATE = {
     bitsPerMinute: 100,
     donationDollarsPerMinute: 1,
     targetTimeMs: null, // Target time in milliseconds (null = disabled)
+    hardCapMs: null, // Hard cap maximum time in milliseconds (null = disabled)
   },
   eventLog: [],
 };

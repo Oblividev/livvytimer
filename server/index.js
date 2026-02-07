@@ -57,6 +57,7 @@ io.on('connection', (socket) => {
   });
   socket.emit('config:update', state.config);
   socket.emit('target:update', { targetTimeMs: state.config.targetTimeMs });
+  socket.emit('hardcap:update', { hardCapMs: state.config.hardCapMs });
   socket.emit('connection:status', connectionStatus);
   socket.emit('eventLog:init', (state.eventLog || []).slice(-50));
 
@@ -117,6 +118,25 @@ io.on('connection', (socket) => {
       updateConfig(state, { targetTimeMs: targetMs });
       io.emit('target:update', { targetTimeMs: targetMs });
       console.log('[Target] Set to:', targetMs ? `${Math.floor(targetMs / 60000)}min` : 'disabled');
+    }
+  });
+
+  // ── Hard cap updates ─────────────────────────────────────────
+  socket.on('hardcap:set', (data) => {
+    if (data && data.hardCapMs !== undefined) {
+      const capMs = data.hardCapMs === null || data.hardCapMs === '' ? null : parseInt(data.hardCapMs);
+      state.config.hardCapMs = capMs;
+      updateConfig(state, { hardCapMs: capMs });
+      io.emit('hardcap:update', { hardCapMs: capMs });
+      console.log('[Hard Cap] Set to:', capMs ? `${Math.floor(capMs / 60000)}min` : 'disabled');
+      
+      // If current time exceeds cap, clamp it
+      if (capMs && state.timer.remainingMs > capMs) {
+        state.timer.remainingMs = capMs;
+        timer.emitUpdate();
+        saveState(state);
+        console.log('[Hard Cap] Clamped timer to cap');
+      }
     }
   });
 
