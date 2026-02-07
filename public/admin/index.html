@@ -212,6 +212,58 @@
         <button class="btn btn-save" id="btnSaveConfig">Save Configuration</button>
       </section>
 
+      <!-- Test Events -->
+      <section class="card">
+        <h2 class="card-title">Test Events</h2>
+        <p class="card-desc">Simulate events to test the timer without real Twitch/Streamlabs connections.</p>
+        
+        <h3 class="card-subtitle">Twitch Events</h3>
+        <div class="test-events-grid">
+          <div class="test-event-group">
+            <label>Subscriptions</label>
+            <div class="test-event-buttons">
+              <button class="btn btn-test" id="testTier1">Tier 1 Sub</button>
+              <button class="btn btn-test" id="testTier2">Tier 2 Sub</button>
+              <button class="btn btn-test" id="testTier3">Tier 3 Sub</button>
+            </div>
+          </div>
+          <div class="test-event-group">
+            <label>Gifted Subs</label>
+            <div class="test-event-input-row">
+              <input type="number" id="testGiftedCount" min="1" max="100" value="1" class="test-input">
+              <button class="btn btn-test" id="testGifted">Gift Subs</button>
+            </div>
+          </div>
+          <div class="test-event-group">
+            <label>Bits</label>
+            <div class="test-event-input-row">
+              <input type="number" id="testBitsCount" min="1" max="100000" value="100" class="test-input">
+              <button class="btn btn-test" id="testBits">Cheer Bits</button>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="card-subtitle">Streamlabs Events</h3>
+        <div class="test-events-grid">
+          <div class="test-event-group">
+            <label>Donation</label>
+            <div class="test-event-input-row">
+              <input type="number" id="testDonationAmount" min="0.01" step="0.01" value="1.00" class="test-input">
+              <span class="test-input-label">USD</span>
+              <button class="btn btn-test" id="testDonation">Donate</button>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="card-subtitle">Custom Test</h3>
+        <div class="test-event-group">
+          <label>Custom Username (optional)</label>
+          <div class="test-event-input-row">
+            <input type="text" id="testCustomUsername" placeholder="TestUser" class="test-input-text">
+          </div>
+        </div>
+      </section>
+
       <!-- Event Log -->
       <section class="card log-section">
         <h2 class="card-title">Event Log</h2>

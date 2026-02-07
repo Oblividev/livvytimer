@@ -614,6 +614,94 @@ body {
   white-space: nowrap;
 }
 
+/* ── Test Events ───────────────────────────────────────────── */
+
+.test-events-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.test-event-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.test-event-group label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.test-event-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.test-event-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.test-input {
+  width: 100px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-align: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.test-input:focus {
+  border-color: var(--border-focus);
+}
+
+.test-input-text {
+  width: 150px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.test-input-text:focus {
+  border-color: var(--border-focus);
+}
+
+.test-input-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.btn-test {
+  border-color: rgba(197, 184, 217, 0.3);
+  color: var(--soft-lavender);
+  font-size: 0.8rem;
+  padding: 6px 14px;
+}
+.btn-test:hover {
+  background: rgba(197, 184, 217, 0.08);
+  border-color: rgba(197, 184, 217, 0.5);
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 
 @media (max-width: 600px) {
@@ -636,6 +724,16 @@ body {
   }
 
   .time-field input {
+    width: 100%;
+  }
+
+  .test-event-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .test-input,
+  .test-input-text {
     width: 100%;
   }
 }

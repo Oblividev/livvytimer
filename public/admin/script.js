@@ -452,6 +452,52 @@ btnClearCap.addEventListener('click', () => {
   socket.emit('hardcap:set', { hardCapMs: null });
 });
 
+// ── Test Events ────────────────────────────────────────────────
+
+// Get test event elements
+const testTier1 = document.getElementById('testTier1');
+const testTier2 = document.getElementById('testTier2');
+const testTier3 = document.getElementById('testTier3');
+const testGifted = document.getElementById('testGifted');
+const testGiftedCount = document.getElementById('testGiftedCount');
+const testBits = document.getElementById('testBits');
+const testBitsCount = document.getElementById('testBitsCount');
+const testDonation = document.getElementById('testDonation');
+const testDonationAmount = document.getElementById('testDonationAmount');
+const testCustomUsername = document.getElementById('testCustomUsername');
+
+function getTestUsername() {
+  const username = testCustomUsername.value.trim();
+  return username || 'TestUser';
+}
+
+testTier1.addEventListener('click', () => {
+  socket.emit('test:subscription', { tier: '1000', userName: getTestUsername() });
+});
+
+testTier2.addEventListener('click', () => {
+  socket.emit('test:subscription', { tier: '2000', userName: getTestUsername() });
+});
+
+testTier3.addEventListener('click', () => {
+  socket.emit('test:subscription', { tier: '3000', userName: getTestUsername() });
+});
+
+testGifted.addEventListener('click', () => {
+  const count = parseInt(testGiftedCount.value) || 1;
+  socket.emit('test:giftedSubs', { total: count, userName: getTestUsername() });
+});
+
+testBits.addEventListener('click', () => {
+  const bits = parseInt(testBitsCount.value) || 100;
+  socket.emit('test:bits', { bits: bits, userName: getTestUsername() });
+});
+
+testDonation.addEventListener('click', () => {
+  const amount = parseFloat(testDonationAmount.value) || 1.0;
+  socket.emit('test:donation', { amount: amount, userName: getTestUsername() });
+});
+
 // ── Keyboard shortcut: Space to toggle pause ──────────────
 document.addEventListener('keydown', (e) => {
   // Don't trigger if typing in an input

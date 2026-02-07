@@ -92,4 +92,4 @@ function disconnectStreamlabs() {
   }
 }
 
-module.exports = { connectStreamlabs, disconnectStreamlabs };
+module.exports = { connectStreamlabs, disconnectStreamlabs, handleDonation };

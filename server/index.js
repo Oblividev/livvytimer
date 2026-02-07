@@ -6,8 +6,8 @@ const path = require('path');
 const { Server } = require('socket.io');
 const { loadState, saveState, updateConfig } = require('./config');
 const { createTimer } = require('./timer');
-const { connectTwitch, disconnectTwitch } = require('./twitch');
-const { connectStreamlabs, disconnectStreamlabs } = require('./streamlabs');
+const { connectTwitch, disconnectTwitch, handleEvent } = require('./twitch');
+const { connectStreamlabs, disconnectStreamlabs, handleDonation } = require('./streamlabs');
 
 const PORT = process.env.PORT || 3000;
 
@@ -138,6 +138,52 @@ io.on('connection', (socket) => {
         console.log('[Hard Cap] Clamped timer to cap');
       }
     }
+  });
+
+  // ── Test Events ────────────────────────────────────────────────
+  socket.on('test:subscription', (data) => {
+    const tier = data.tier || '1000';
+    const userName = data.userName || 'TestUser';
+    handleEvent(state, timer, 'channel.subscribe', {
+      tier: tier,
+      user_name: userName,
+    });
+    console.log(`[Test] Simulated Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'} sub from ${userName}`);
+  });
+
+  socket.on('test:giftedSubs', (data) => {
+    const total = data.total || 1;
+    const userName = data.userName || 'TestUser';
+    handleEvent(state, timer, 'channel.subscription.gift', {
+      total: total,
+      user_name: userName,
+    });
+    console.log(`[Test] Simulated ${total} gifted sub(s) from ${userName}`);
+  });
+
+  socket.on('test:bits', (data) => {
+    const bits = data.bits || 100;
+    const userName = data.userName || 'TestUser';
+    handleEvent(state, timer, 'channel.cheer', {
+      bits: bits,
+      user_name: userName,
+    });
+    console.log(`[Test] Simulated ${bits} bits from ${userName}`);
+  });
+
+  socket.on('test:donation', (data) => {
+    const amount = parseFloat(data.amount) || 1.0;
+    const userName = data.userName || 'TestUser';
+    handleDonation(state, timer, {
+      type: 'donation',
+      message: [{
+        name: userName,
+        amount: amount,
+        currency: 'USD',
+        formatted_amount: `USD ${amount.toFixed(2)}`,
+      }],
+    });
+    console.log(`[Test] Simulated $${amount.toFixed(2)} donation from ${userName}`);
   });
 
   socket.on('disconnect', () => {

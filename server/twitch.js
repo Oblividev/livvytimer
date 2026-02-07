@@ -282,4 +282,4 @@ function disconnectTwitch() {
   sessionId = null;
 }
 
-module.exports = { connectTwitch, disconnectTwitch };
+module.exports = { connectTwitch, disconnectTwitch, handleEvent };
