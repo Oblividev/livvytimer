@@ -89,6 +89,14 @@ async function subscribeToEvents(sessionId, accessToken, clientId, broadcasterId
   }
 }
 
+// Twitch sends tier as "1000"|"2000"|"3000" (string) or 1000|2000|3000 (number)
+function subTierLevel(tier) {
+  const n = Number(tier);
+  if (n === 2000) return 2;
+  if (n === 3000) return 3;
+  return 1;
+}
+
 // ── Process incoming events ───────────────────────────────────
 function handleEvent(state, timer, eventType, eventData) {
   const config = state.config;
@@ -96,10 +104,16 @@ function handleEvent(state, timer, eventType, eventData) {
 
   switch (eventType) {
     case 'channel.subscribe': {
-      const tier = eventData.tier; // "1000", "2000", "3000"
+      // Gift subs are credited on channel.subscription.gift; recipient subscribe is duplicate
+      if (eventData.is_gift) {
+        console.log(`[Twitch] Skipping gift recipient subscribe (${eventData.user_name || 'Anonymous'})`);
+        break;
+      }
+
+      const tierLevel = subTierLevel(eventData.tier);
       let minutes = config.tier1SubMinutes;
-      if (tier === '2000') minutes = config.tier2SubMinutes;
-      if (tier === '3000') minutes = config.tier3SubMinutes;
+      if (tierLevel === 2) minutes = config.tier2SubMinutes;
+      if (tierLevel === 3) minutes = config.tier3SubMinutes;
 
       // Apply intelligent adjustment
       const adjustedMinutes = minutes * adjustment;
@@ -109,9 +123,9 @@ function handleEvent(state, timer, eventType, eventData) {
       timer.addTime(
         adjustedMs,
         'Subscription',
-        `${userName} (Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
+        `${userName} (Tier ${tierLevel})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
       );
-      console.log(`[Twitch] Sub from ${userName} (Tier ${tier}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
+      console.log(`[Twitch] Sub from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       break;
     }
 
