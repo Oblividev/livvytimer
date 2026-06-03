@@ -1,5 +1,11 @@
 const WebSocket = require('ws');
 const https = require('https');
+const {
+  ensureAccessToken,
+  refreshAccessToken,
+  getAccessToken,
+  stopTwitchAuth,
+} = require('./twitch-auth');
 
 let ws = null;
 let reconnectTimeout = null;
@@ -41,7 +47,8 @@ function twitchApiRequest(method, path, body, accessToken, clientId) {
 }
 
 // ── Subscribe to EventSub topics ──────────────────────────────
-async function subscribeToEvents(sessionId, accessToken, clientId, broadcasterId) {
+async function subscribeToEvents(sessionId, clientId, broadcasterId) {
+  let accessToken = getAccessToken();
   const topics = [
     {
       type: 'channel.subscribe',
@@ -80,6 +87,34 @@ async function subscribeToEvents(sessionId, accessToken, clientId, broadcasterId
 
       if (result.status === 202) {
         console.log(`[Twitch] Subscribed to ${topic.type}`);
+      } else if (result.status === 401) {
+        console.log('[Twitch] Subscription unauthorized — refreshing token and retrying...');
+        try {
+          await refreshAccessToken({ reason: '401 on subscribe' });
+          accessToken = getAccessToken();
+          const retry = await twitchApiRequest(
+            'POST',
+            '/helix/eventsub/subscriptions',
+            {
+              type: topic.type,
+              version: topic.version,
+              condition: topic.condition,
+              transport: {
+                method: 'websocket',
+                session_id: sessionId,
+              },
+            },
+            accessToken,
+            clientId
+          );
+          if (retry.status === 202) {
+            console.log(`[Twitch] Subscribed to ${topic.type} (after refresh)`);
+          } else {
+            console.error(`[Twitch] Failed to subscribe to ${topic.type}:`, retry.status, JSON.stringify(retry.data));
+          }
+        } catch (err) {
+          console.error(`[Twitch] Token refresh failed for ${topic.type}:`, err.message);
+        }
       } else {
         console.error(`[Twitch] Failed to subscribe to ${topic.type}:`, result.status, JSON.stringify(result.data));
       }
@@ -173,14 +208,20 @@ function handleEvent(state, timer, eventType, eventData) {
 }
 
 // ── WebSocket connection ──────────────────────────────────────
-function connectTwitch(state, timer, setStatus) {
-  const clientId = process.env.TWITCH_CLIENT_ID;
-  const accessToken = process.env.TWITCH_ACCESS_TOKEN;
-  const broadcasterId = process.env.TWITCH_BROADCASTER_ID;
+async function connectTwitch(state, timer, setStatus) {
+  const clientId = (process.env.TWITCH_CLIENT_ID || '').trim();
+  const broadcasterId = (process.env.TWITCH_BROADCASTER_ID || '').trim();
 
-  if (!clientId || !accessToken || !broadcasterId) {
+  if (!clientId || !broadcasterId) {
     console.log('[Twitch] Missing credentials. Skipping Twitch connection.');
-    console.log('[Twitch] Set TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN, and TWITCH_BROADCASTER_ID in .env');
+    console.log('[Twitch] Set TWITCH_CLIENT_ID and TWITCH_BROADCASTER_ID in .env');
+    setStatus('twitch', 'not_configured');
+    return;
+  }
+
+  const tokenReady = await ensureAccessToken();
+  if (!tokenReady) {
+    console.log('[Twitch] No valid Twitch token. Set TWITCH_ACCESS_TOKEN and/or TWITCH_REFRESH_TOKEN.');
     setStatus('twitch', 'not_configured');
     return;
   }
@@ -215,7 +256,7 @@ function connectTwitch(state, timer, setStatus) {
         resetKeepalive(keepaliveSeconds, state, timer, setStatus);
 
         // Subscribe to events
-        await subscribeToEvents(sessionId, accessToken, clientId, broadcasterId);
+        await subscribeToEvents(sessionId, clientId, broadcasterId);
         break;
       }
 
@@ -287,6 +328,7 @@ function resetKeepalive(seconds, state, timer, setStatus) {
 }
 
 function disconnectTwitch() {
+  stopTwitchAuth();
   if (reconnectTimeout) clearTimeout(reconnectTimeout);
   if (keepaliveTimeout) clearTimeout(keepaliveTimeout);
   if (ws) {

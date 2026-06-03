@@ -6,7 +6,9 @@ require('dotenv').config();
 const https = require('https');
 
 const clientId = (process.env.TWITCH_CLIENT_ID || '').trim();
+const clientSecret = (process.env.TWITCH_CLIENT_SECRET || '').trim();
 const accessToken = (process.env.TWITCH_ACCESS_TOKEN || '').trim().replace(/^oauth:/i, '');
+const refreshToken = (process.env.TWITCH_REFRESH_TOKEN || '').trim();
 const broadcasterId = (process.env.TWITCH_BROADCASTER_ID || '').trim();
 
 const REQUIRED_SCOPES = ['channel:read:subscriptions', 'bits:read'];
@@ -30,16 +32,27 @@ function get(url, headers) {
 async function main() {
   console.log('\n  Twitch auth diagnostic\n');
 
-  if (!clientId || !accessToken || !broadcasterId) {
-    console.log('  Missing TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN, or TWITCH_BROADCASTER_ID in .env\n');
+  if (!clientId || !broadcasterId) {
+    console.log('  Missing TWITCH_CLIENT_ID or TWITCH_BROADCASTER_ID in .env\n');
     process.exit(1);
   }
 
-  if (process.env.TWITCH_ACCESS_TOKEN.includes('oauth:')) {
+  if (!accessToken && !refreshToken) {
+    console.log('  Missing TWITCH_ACCESS_TOKEN or TWITCH_REFRESH_TOKEN in .env\n');
+    process.exit(1);
+  }
+
+  if (accessToken && process.env.TWITCH_ACCESS_TOKEN?.includes('oauth:')) {
     console.log('  WARN: Token has "oauth:" prefix — remove it from .env (only the raw token)\n');
   }
-  if (/\s/.test(process.env.TWITCH_ACCESS_TOKEN)) {
+  if (accessToken && /\s/.test(process.env.TWITCH_ACCESS_TOKEN)) {
     console.log('  WARN: Token contains whitespace — check for trailing spaces/newlines\n');
+  }
+
+  if (!accessToken) {
+    console.log('  Access token not set; refresh token is configured.');
+    console.log('  → Start the server — it will obtain an access token on startup.\n');
+    process.exit(0);
   }
 
   const validation = await get('https://id.twitch.tv/oauth2/validate', {
@@ -48,7 +61,12 @@ async function main() {
 
   if (validation.status !== 200) {
     console.log('  Token validation FAILED:', validation.status, validation.data.message || validation.data);
-    console.log('  → Regenerate token and update TWITCH_ACCESS_TOKEN\n');
+    console.log(`  Refresh token:   ${refreshToken ? 'set in .env' : 'not set'}`);
+    if (refreshToken && clientSecret) {
+      console.log('  → Access token expired; server will refresh on startup.\n');
+      process.exit(0);
+    }
+    console.log('  → Regenerate token and update TWITCH_ACCESS_TOKEN (and TWITCH_REFRESH_TOKEN)\n');
     process.exit(1);
   }
 
@@ -63,7 +81,10 @@ async function main() {
   console.log(`  Broadcaster ID:  ${broadcasterId}`);
   console.log(`  Client ID match: ${tokenClientId === clientId ? 'yes' : 'NO — token is for a different app'}`);
   console.log(`  Broadcaster match: ${tokenUserId === broadcasterId ? 'yes' : 'NO — token must be from the channel owner'}`);
-  console.log(`  Expires in:      ~${expiresHours} hours`);
+  if (validation.status === 200) {
+    console.log(`  Expires in:      ~${expiresHours} hours`);
+  }
+  console.log(`  Refresh token:   ${refreshToken ? 'set in .env' : 'not set'}`);
   console.log(`  Scopes:          ${scopes.length ? scopes.join(', ') : '(none)'}`);
 
   const missingScopes = REQUIRED_SCOPES.filter((s) => !scopes.includes(s));

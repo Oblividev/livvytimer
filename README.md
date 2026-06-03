@@ -41,12 +41,16 @@ You need a user access token with the right scopes. The easiest way:
 
 1. Go to https://twitchtokengenerator.com/
 2. Select **Custom Scope Token**
-3. Check these scopes:
+3. Paste your **Client ID** and **Client Secret** from step 1 (required for auto-refresh)
+4. In the [Twitch Developer Console](https://dev.twitch.tv/console), add this redirect URL to your app: `https://twitchtokengenerator.com`
+5. Check these scopes:
    - `channel:read:subscriptions`
    - `bits:read`
-4. Click **Generate Token**
-5. Authorize with the broadcaster's Twitch account
-6. Copy the **Access Token**
+6. Click **Generate Token**
+7. Authorize with the broadcaster's Twitch account
+8. Copy the **Access Token** and **Refresh Token** into `.env`
+
+The server refreshes the access token automatically when `TWITCH_REFRESH_TOKEN` is set (and writes the new tokens back to `.env`). Tokens generated without your own Client ID/Secret cannot be refreshed by this app.
 
 ### 3. Find Your Twitch Broadcaster ID
 
@@ -69,6 +73,7 @@ Copy `.env.example` to `.env` and fill in all values:
 TWITCH_CLIENT_ID=your_client_id
 TWITCH_CLIENT_SECRET=your_client_secret
 TWITCH_ACCESS_TOKEN=your_oauth_token
+TWITCH_REFRESH_TOKEN=your_refresh_token
 TWITCH_BROADCASTER_ID=your_broadcaster_id
 STREAMLABS_SOCKET_TOKEN=your_streamlabs_socket_token
 PORT=3000
@@ -138,7 +143,8 @@ All values are configurable from the admin panel.
 
 **Twitch not connecting?**
 - Check your `.env` credentials are correct
-- Make sure the OAuth token hasn't expired
+- Run `node scripts/check-twitch-auth.js` to validate the access token
+- Set `TWITCH_REFRESH_TOKEN` (with your app's Client ID/Secret) so the server can renew expired tokens
 - Check the console output for error messages
 
 **Streamlabs not connecting?**
