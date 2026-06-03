@@ -16,6 +16,13 @@
   --glow-pink: #FFD0DC;
   --pixel-shadow: #2A1B3D;
   --card-shadow: rgba(42, 27, 61, 0.25);
+  --glass-bg: rgba(255, 248, 240, 0.22);
+  --glass-bg-strong: rgba(255, 248, 240, 0.38);
+  --glass-border: rgba(255, 255, 255, 0.45);
+  --glass-highlight: rgba(255, 255, 255, 0.55);
+  --glass-shadow: rgba(42, 27, 61, 0.35);
+  --text-outline: 0 1px 2px rgba(42, 27, 61, 0.95), 0 2px 8px rgba(42, 27, 61, 0.65);
+  --text-outline-soft: 0 1px 3px rgba(42, 27, 61, 0.82), 0 2px 6px rgba(42, 27, 61, 0.45);
 }
 
 /* ── Reset & Canvas ──────────────────────────────────────── */
@@ -44,25 +51,56 @@ body {
 
 .timer-card {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(126, 200, 227, 0.08) 0%,
-    rgba(197, 184, 217, 0.10) 50%,
-    rgba(255, 183, 197, 0.08) 100%
-  );
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  isolation: isolate;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 248, 240, 0.24) 0%,
+      rgba(126, 200, 227, 0.22) 35%,
+      rgba(197, 184, 217, 0.18) 65%,
+      rgba(255, 183, 197, 0.22) 100%
+    );
+  backdrop-filter: blur(24px) saturate(1.45);
+  -webkit-backdrop-filter: blur(24px) saturate(1.45);
   border: 1px solid var(--frost-border);
-  border-radius: 20px;
-  padding: 18px 40px 22px;
-  min-width: 360px;
+  border-radius: 22px;
+  padding: 20px 42px 24px;
+  min-width: 380px;
   text-align: center;
   box-shadow:
-    0 4px 30px var(--card-shadow),
-    0 0 60px rgba(126, 200, 227, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 8px 32px var(--glass-shadow),
+    0 2px 8px rgba(42, 27, 61, 0.18),
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
   overflow: hidden;
   animation: cardFloat 6s ease-in-out infinite;
+}
+
+.timer-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 255, 255, 0.42), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 42%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.timer-card::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 21px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.timer-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes cardFloat {
@@ -96,23 +134,32 @@ body {
 .anniversary-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: linear-gradient(
-    90deg,
-    rgba(126, 200, 227, 0.15),
-    rgba(255, 183, 197, 0.18),
-    rgba(197, 184, 217, 0.15)
-  );
-  border: 1px solid rgba(255, 183, 197, 0.3);
-  border-radius: 20px;
-  padding: 4px 14px;
-  margin-bottom: 8px;
+  gap: 7px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 248, 240, 0.42) 45%,
+      rgba(197, 184, 217, 0.35) 100%
+    );
+  backdrop-filter: blur(12px) saturate(1.3);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-bottom: 10px;
   font-family: 'DotGothic16', monospace;
-  font-size: 11px;
-  letter-spacing: 1.5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--sakura-pink);
-  text-shadow: 0 0 12px rgba(255, 183, 197, 0.5);
+  color: var(--pixel-shadow);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 1px rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 2px 12px rgba(42, 27, 61, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
   animation: badgeGlow 3s ease-in-out infinite;
 }
 
@@ -131,8 +178,17 @@ body {
 }
 
 @keyframes badgeGlow {
-  0%, 100% { text-shadow: 0 0 12px rgba(255, 183, 197, 0.5); }
-  50% { text-shadow: 0 0 20px rgba(255, 183, 197, 0.7), 0 0 40px rgba(126, 200, 227, 0.3); }
+  0%, 100% {
+    box-shadow:
+      0 2px 12px rgba(42, 27, 61, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+  50% {
+    box-shadow:
+      0 4px 18px rgba(126, 200, 227, 0.28),
+      0 2px 12px rgba(42, 27, 61, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
 }
 
 /* ── Countdown Display ───────────────────────────────────── */
@@ -143,6 +199,21 @@ body {
   justify-content: center;
   gap: 2px;
   user-select: none;
+  margin-top: 2px;
+  padding: 10px 18px 12px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(42, 27, 61, 0.28) 0%,
+      rgba(42, 27, 61, 0.38) 100%
+    );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 4px 16px rgba(42, 27, 61, 0.2);
 }
 
 .digit-group {
@@ -150,11 +221,11 @@ body {
   font-weight: 900;
   font-size: 64px;
   line-height: 1;
-  color: var(--warm-cream);
+  color: #FFFFFF;
   text-shadow:
-    0 0 20px rgba(168, 228, 240, 0.6),
-    0 0 40px rgba(168, 228, 240, 0.3),
-    0 2px 4px var(--card-shadow);
+    var(--text-outline),
+    0 0 24px rgba(168, 228, 240, 0.55),
+    0 0 48px rgba(126, 200, 227, 0.25);
   min-width: 85px;
   display: inline-block;
   text-align: center;
@@ -166,9 +237,11 @@ body {
   font-family: 'Zen Maru Gothic', sans-serif;
   font-weight: 700;
   font-size: 52px;
-  color: var(--sakura-blue);
-  opacity: 0.7;
-  text-shadow: 0 0 15px rgba(126, 200, 227, 0.5);
+  color: var(--glow-cyan);
+  opacity: 0.95;
+  text-shadow:
+    var(--text-outline),
+    0 0 18px rgba(168, 228, 240, 0.7);
   animation: separatorPulse 1s steps(2, start) infinite;
   position: relative;
   top: -3px;
@@ -177,38 +250,49 @@ body {
 @keyframes digitGlow {
   0%, 100% {
     text-shadow:
-      0 0 20px rgba(168, 228, 240, 0.6),
-      0 0 40px rgba(168, 228, 240, 0.3),
-      0 2px 4px var(--card-shadow);
+      var(--text-outline),
+      0 0 24px rgba(168, 228, 240, 0.55),
+      0 0 48px rgba(126, 200, 227, 0.25);
   }
   50% {
     text-shadow:
-      0 0 25px rgba(168, 228, 240, 0.8),
-      0 0 50px rgba(168, 228, 240, 0.4),
-      0 0 80px rgba(126, 200, 227, 0.15),
-      0 2px 4px var(--card-shadow);
+      var(--text-outline),
+      0 0 30px rgba(168, 228, 240, 0.75),
+      0 0 60px rgba(126, 200, 227, 0.35);
   }
 }
 
 @keyframes separatorPulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 0.3; }
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.55; }
 }
 
 /* ── Critical State (< 5 min) ────────────────────────────── */
 
 .timer-card.critical .digit-group {
-  color: var(--sakura-pink);
+  color: #FFE8EE;
   text-shadow:
-    0 0 20px rgba(255, 143, 163, 0.7),
-    0 0 40px rgba(255, 143, 163, 0.4),
-    0 2px 4px var(--card-shadow);
+    var(--text-outline),
+    0 0 24px rgba(255, 143, 163, 0.75),
+    0 0 48px rgba(255, 183, 197, 0.35);
   animation: criticalPulse 0.8s ease-in-out infinite;
 }
 
 .timer-card.critical .separator {
-  color: var(--sakura-pink);
-  text-shadow: 0 0 15px rgba(255, 143, 163, 0.5);
+  color: var(--sakura-pink-hot);
+  text-shadow:
+    var(--text-outline),
+    0 0 18px rgba(255, 143, 163, 0.65);
+}
+
+.timer-card.critical .countdown {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(42, 27, 61, 0.34) 0%,
+      rgba(80, 24, 42, 0.42) 100%
+    );
+  border-color: rgba(255, 143, 163, 0.35);
 }
 
 .timer-card.critical {
@@ -219,16 +303,15 @@ body {
 @keyframes criticalPulse {
   0%, 100% {
     text-shadow:
-      0 0 20px rgba(255, 143, 163, 0.7),
-      0 0 40px rgba(255, 143, 163, 0.4),
-      0 2px 4px var(--card-shadow);
+      var(--text-outline),
+      0 0 24px rgba(255, 143, 163, 0.75),
+      0 0 48px rgba(255, 183, 197, 0.35);
   }
   50% {
     text-shadow:
-      0 0 30px rgba(255, 143, 163, 0.9),
-      0 0 60px rgba(255, 143, 163, 0.5),
-      0 0 90px rgba(255, 183, 197, 0.2),
-      0 2px 4px var(--card-shadow);
+      var(--text-outline),
+      0 0 32px rgba(255, 143, 163, 0.95),
+      0 0 64px rgba(255, 183, 197, 0.45);
   }
 }
 
@@ -371,10 +454,27 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   pointer-events: none;
   opacity: 0;
   z-index: 20;
+  min-width: 220px;
+  padding: 18px 32px 16px;
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.52) 0%,
+      rgba(255, 248, 240, 0.42) 42%,
+      rgba(255, 183, 197, 0.28) 100%
+    );
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow:
+    0 12px 40px rgba(42, 27, 61, 0.35),
+    0 4px 12px rgba(42, 27, 61, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .event-toast.show {
@@ -384,20 +484,22 @@ body {
 .event-toast-amount {
   font-family: 'Zen Maru Gothic', sans-serif;
   font-weight: 900;
-  font-size: 36px;
-  color: var(--sakura-pink);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--pixel-shadow);
   text-shadow:
-    0 0 20px rgba(255, 183, 197, 0.8),
-    0 0 40px rgba(255, 183, 197, 0.4),
-    0 2px 6px var(--card-shadow);
+    0 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 16px rgba(255, 143, 163, 0.35);
 }
 
 .event-toast-label {
   font-family: 'DotGothic16', monospace;
-  font-size: 14px;
-  letter-spacing: 1px;
-  color: var(--glow-cyan);
-  text-shadow: 0 0 12px rgba(168, 228, 240, 0.6);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #1E3A4A;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 @keyframes toastShow {
