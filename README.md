@@ -112,7 +112,7 @@ Set how much time each event type adds:
 - **$ per 1 min**: How many dollars of donations equal 1 minute
 
 ### Event Log
-Real-time feed showing all events that have added time.
+Real-time feed showing all events that have added time. Use **Clear** to wipe the log (persisted history is removed from saved state).
 
 ### Connection Status
 Shows whether Twitch and Streamlabs connections are active.
