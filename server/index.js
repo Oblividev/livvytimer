@@ -186,11 +186,11 @@ io.on('connection', (socket) => {
       message: [{
         name: userName,
         amount: amount,
-        currency: 'USD',
-        formatted_amount: `USD ${amount.toFixed(2)}`,
+        currency: 'GBP',
+        formatted_amount: `GBP ${amount.toFixed(2)}`,
       }],
     });
-    console.log(`[Test] Simulated $${amount.toFixed(2)} donation from ${userName}`);
+    console.log(`[Test] Simulated £${amount.toFixed(2)} donation from ${userName}`);
   });
 
   socket.on('disconnect', () => {
