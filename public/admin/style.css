@@ -373,6 +373,26 @@ body {
   color: var(--green);
 }
 
+/* ── Checkbox Row ────────────────────────────────────────── */
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* ── Time Input Row ──────────────────────────────────────── */
 
 .time-input-row {

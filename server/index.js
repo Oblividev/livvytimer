@@ -57,7 +57,10 @@ io.on('connection', (socket) => {
   });
   socket.emit('config:update', state.config);
   socket.emit('target:update', { targetTimeMs: state.config.targetTimeMs });
-  socket.emit('hardcap:update', { hardCapMs: state.config.hardCapMs });
+  socket.emit('hardcap:update', {
+    hardCapMs: state.config.hardCapMs,
+    hardCapBlockEvents: state.config.hardCapBlockEvents,
+  });
   socket.emit('connection:status', connectionStatus);
   socket.emit('eventLog:init', (state.eventLog || []).slice(-50));
 
@@ -130,13 +133,14 @@ io.on('connection', (socket) => {
 
   // ── Hard cap updates ─────────────────────────────────────────
   socket.on('hardcap:set', (data) => {
-    if (data && data.hardCapMs !== undefined) {
+    if (!data) return;
+
+    const updates = {};
+
+    if (data.hardCapMs !== undefined) {
       const capMs = data.hardCapMs === null || data.hardCapMs === '' ? null : parseInt(data.hardCapMs);
-      state.config.hardCapMs = capMs;
-      updateConfig(state, { hardCapMs: capMs });
-      io.emit('hardcap:update', { hardCapMs: capMs });
-      console.log('[Hard Cap] Set to:', capMs ? `${Math.floor(capMs / 60000)}min` : 'disabled');
-      
+      updates.hardCapMs = capMs;
+
       // If current time exceeds cap, clamp it
       if (capMs && state.timer.remainingMs > capMs) {
         state.timer.remainingMs = capMs;
@@ -144,6 +148,25 @@ io.on('connection', (socket) => {
         saveState(state);
         console.log('[Hard Cap] Clamped timer to cap');
       }
+    }
+
+    if (data.hardCapBlockEvents !== undefined) {
+      updates.hardCapBlockEvents = !!data.hardCapBlockEvents;
+    }
+
+    if (Object.keys(updates).length === 0) return;
+
+    updateConfig(state, updates);
+    io.emit('hardcap:update', {
+      hardCapMs: state.config.hardCapMs,
+      hardCapBlockEvents: state.config.hardCapBlockEvents,
+    });
+
+    if (updates.hardCapMs !== undefined) {
+      console.log('[Hard Cap] Set to:', updates.hardCapMs ? `${Math.floor(updates.hardCapMs / 60000)}min` : 'disabled');
+    }
+    if (updates.hardCapBlockEvents !== undefined) {
+      console.log('[Hard Cap] Block events at cap:', updates.hardCapBlockEvents);
     }
   });
 

@@ -79,7 +79,8 @@ function handleDonation(state, timer, eventData) {
     timer.addTime(
       adjustedMs,
       'Donation',
-      `${name} donated ${formattedAmount}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
+      `${name} donated ${formattedAmount}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
+      true
     );
     console.log(`[Streamlabs] ${name} donated ${formattedAmount} → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
   }

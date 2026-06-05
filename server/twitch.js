@@ -158,7 +158,8 @@ function handleEvent(state, timer, eventType, eventData) {
       timer.addTime(
         adjustedMs,
         'Subscription',
-        `${userName} (Tier ${tierLevel})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
+        `${userName} (Tier ${tierLevel})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
+        true
       );
       console.log(`[Twitch] Sub from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       break;
@@ -176,7 +177,8 @@ function handleEvent(state, timer, eventType, eventData) {
       timer.addTime(
         adjustedMs,
         'Gifted Subs',
-        `${userName} gifted ${total} sub${total > 1 ? 's' : ''}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
+        `${userName} gifted ${total} sub${total > 1 ? 's' : ''}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
+        true
       );
       console.log(`[Twitch] ${userName} gifted ${total} subs → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       break;
@@ -195,7 +197,8 @@ function handleEvent(state, timer, eventType, eventData) {
         timer.addTime(
           adjustedMs,
           'Bits',
-          `${userName} cheered ${bits} bits${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`
+          `${userName} cheered ${bits} bits${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
+          true
         );
         console.log(`[Twitch] ${userName} cheered ${bits} bits → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       }

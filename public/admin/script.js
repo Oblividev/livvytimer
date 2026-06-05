@@ -55,6 +55,7 @@ const btnClearCap = document.getElementById('btnClearCap');
 const capStatus = document.getElementById('capStatus');
 const capDisplay = document.getElementById('capDisplay');
 const capStatusText = document.getElementById('capStatusText');
+const capBlockEvents = document.getElementById('capBlockEvents');
 
 // Connection status
 const twitchDot = document.getElementById('twitchDot');
@@ -321,6 +322,7 @@ socket.on('target:update', (data) => {
 
 socket.on('hardcap:update', (data) => {
   hardCapMs = data.hardCapMs || null;
+  capBlockEvents.checked = data.hardCapBlockEvents !== false;
   if (hardCapMs) {
     const time = formatMs(hardCapMs);
     capHours.value = parseInt(time.hours);
@@ -467,6 +469,10 @@ btnSetCap.addEventListener('click', () => {
 
 btnClearCap.addEventListener('click', () => {
   socket.emit('hardcap:set', { hardCapMs: null });
+});
+
+capBlockEvents.addEventListener('change', () => {
+  socket.emit('hardcap:set', { hardCapBlockEvents: capBlockEvents.checked });
 });
 
 // ── Test Events ────────────────────────────────────────────────

@@ -19,6 +19,7 @@ const DEFAULT_STATE = {
     donationDollarsPerMinute: 1,
     targetTimeMs: null, // Target time in milliseconds (null = disabled)
     hardCapMs: null, // Hard cap maximum time in milliseconds (null = disabled)
+    hardCapBlockEvents: true, // When at cap, block event-based time additions
   },
   eventLog: [],
 };
