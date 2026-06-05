@@ -514,6 +514,18 @@ body {
   color: var(--sakura-pink);
 }
 
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-header-row .card-title {
+  margin-bottom: 0;
+}
+
 /* ── Event Log ───────────────────────────────────────────── */
 
 .log-section {

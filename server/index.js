@@ -103,6 +103,13 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('eventLog:clear', () => {
+    state.eventLog = [];
+    saveState(state);
+    io.emit('eventLog:cleared');
+    console.log('[EventLog] Cleared');
+  });
+
   // ── Config updates ──────────────────────────────────────────
   socket.on('config:update', (newConfig) => {
     const updated = updateConfig(state, newConfig);

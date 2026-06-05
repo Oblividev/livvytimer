@@ -64,6 +64,7 @@ const streamlabsStatusEl = document.getElementById('streamlabsStatus');
 
 // Event log
 const eventLog = document.getElementById('eventLog');
+const btnClearLog = document.getElementById('btnClearLog');
 
 // ── State ─────────────────────────────────────────────────
 let currentState = { remainingMs: 0, isRunning: false, isPaused: false };
@@ -255,6 +256,16 @@ function clearLogEmpty() {
   if (empty) empty.remove();
 }
 
+function resetEventLogUI() {
+  eventLog.querySelectorAll('.log-entry').forEach((el) => el.remove());
+  if (!eventLog.querySelector('.log-empty')) {
+    const empty = document.createElement('div');
+    empty.className = 'log-empty';
+    empty.textContent = 'No events yet. Events will appear here in real time.';
+    eventLog.appendChild(empty);
+  }
+}
+
 function addLogEntry(entry) {
   clearLogEmpty();
 
@@ -339,6 +350,8 @@ socket.on('eventLog:init', (entries) => {
   }
 });
 
+socket.on('eventLog:cleared', resetEventLogUI);
+
 socket.on('timer:expired', () => {
   addLogEntry({
     type: 'remove',
@@ -350,6 +363,10 @@ socket.on('timer:expired', () => {
 });
 
 // ── Button handlers ───────────────────────────────────────
+
+btnClearLog.addEventListener('click', () => {
+  socket.emit('eventLog:clear');
+});
 
 btnStart.addEventListener('click', () => {
   socket.emit('timer:start', {});
