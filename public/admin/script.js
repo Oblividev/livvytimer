@@ -481,6 +481,7 @@ capBlockEvents.addEventListener('change', () => {
 const testTier1 = document.getElementById('testTier1');
 const testTier2 = document.getElementById('testTier2');
 const testTier3 = document.getElementById('testTier3');
+const testResub = document.getElementById('testResub');
 const testGifted = document.getElementById('testGifted');
 const testGiftedCount = document.getElementById('testGiftedCount');
 const testBits = document.getElementById('testBits');
@@ -504,6 +505,10 @@ testTier2.addEventListener('click', () => {
 
 testTier3.addEventListener('click', () => {
   socket.emit('test:subscription', { tier: '3000', userName: getTestUsername() });
+});
+
+testResub.addEventListener('click', () => {
+  socket.emit('test:resub', { tier: '1000', userName: getTestUsername(), cumulativeMonths: 3 });
 });
 
 testGifted.addEventListener('click', () => {

@@ -56,6 +56,11 @@ async function subscribeToEvents(sessionId, clientId, broadcasterId) {
       condition: { broadcaster_user_id: broadcasterId },
     },
     {
+      type: 'channel.subscription.message',
+      version: '1',
+      condition: { broadcaster_user_id: broadcasterId },
+    },
+    {
       type: 'channel.subscription.gift',
       version: '1',
       condition: { broadcaster_user_id: broadcasterId },
@@ -132,6 +137,40 @@ function subTierLevel(tier) {
   return 1;
 }
 
+function applySubTime(state, timer, eventData, { source, logLabel }) {
+  const config = state.config;
+  const adjustment = timer.getTimeAdjustment ? timer.getTimeAdjustment() : 1.0;
+
+  // Gift subs are credited on channel.subscription.gift; recipient subscribe/resub is duplicate
+  if (eventData.is_gift) {
+    console.log(`[Twitch] Skipping gift recipient ${logLabel} (${eventData.user_name || 'Anonymous'})`);
+    return;
+  }
+
+  const tierLevel = subTierLevel(eventData.tier);
+  let minutes = config.tier1SubMinutes;
+  if (tierLevel === 2) minutes = config.tier2SubMinutes;
+  if (tierLevel === 3) minutes = config.tier3SubMinutes;
+
+  const adjustedMinutes = minutes * adjustment;
+  const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
+
+  const userName = eventData.user_name || 'Anonymous';
+  const monthsSuffix =
+    eventData.cumulative_months != null ? `, ${eventData.cumulative_months} months` : '';
+  const adjustmentSuffix = adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : '';
+
+  timer.addTime(
+    adjustedMs,
+    source,
+    `${userName} (Tier ${tierLevel}${monthsSuffix})${adjustmentSuffix}`,
+    true
+  );
+  console.log(
+    `[Twitch] ${logLabel} from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`
+  );
+}
+
 // ── Process incoming events ───────────────────────────────────
 function handleEvent(state, timer, eventType, eventData) {
   const config = state.config;
@@ -139,29 +178,12 @@ function handleEvent(state, timer, eventType, eventData) {
 
   switch (eventType) {
     case 'channel.subscribe': {
-      // Gift subs are credited on channel.subscription.gift; recipient subscribe is duplicate
-      if (eventData.is_gift) {
-        console.log(`[Twitch] Skipping gift recipient subscribe (${eventData.user_name || 'Anonymous'})`);
-        break;
-      }
+      applySubTime(state, timer, eventData, { source: 'Subscription', logLabel: 'Sub' });
+      break;
+    }
 
-      const tierLevel = subTierLevel(eventData.tier);
-      let minutes = config.tier1SubMinutes;
-      if (tierLevel === 2) minutes = config.tier2SubMinutes;
-      if (tierLevel === 3) minutes = config.tier3SubMinutes;
-
-      // Apply intelligent adjustment
-      const adjustedMinutes = minutes * adjustment;
-      const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
-
-      const userName = eventData.user_name || 'Anonymous';
-      timer.addTime(
-        adjustedMs,
-        'Subscription',
-        `${userName} (Tier ${tierLevel})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
-        true
-      );
-      console.log(`[Twitch] Sub from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
+    case 'channel.subscription.message': {
+      applySubTime(state, timer, eventData, { source: 'Resub', logLabel: 'Resub' });
       break;
     }
 

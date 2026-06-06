@@ -126,6 +126,7 @@ Shows whether Twitch and Streamlabs connections are active.
 | Tier 1 Sub | Twitch EventSub | +5 min |
 | Tier 2 Sub | Twitch EventSub | +10 min |
 | Tier 3 Sub | Twitch EventSub | +25 min |
+| Resub (any tier) | Twitch EventSub | Same minutes as new sub for that tier |
 | Gifted Sub | Twitch EventSub | +5 min each |
 | Bits/Cheers | Twitch EventSub | +1 min per 100 bits |
 | Donations | Streamlabs | +1 min per $1 |

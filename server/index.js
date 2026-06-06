@@ -181,6 +181,18 @@ io.on('connection', (socket) => {
     console.log(`[Test] Simulated Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'} sub from ${userName}`);
   });
 
+  socket.on('test:resub', (data) => {
+    const tier = data.tier || '1000';
+    const userName = data.userName || 'TestUser';
+    const months = data.cumulativeMonths || 3;
+    handleEvent(state, timer, 'channel.subscription.message', {
+      tier,
+      user_name: userName,
+      cumulative_months: months,
+    });
+    console.log(`[Test] Simulated Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'} resub from ${userName}`);
+  });
+
   socket.on('test:giftedSubs', (data) => {
     const total = data.total || 1;
     const userName = data.userName || 'TestUser';
