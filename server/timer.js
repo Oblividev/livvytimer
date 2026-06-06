@@ -148,15 +148,7 @@ function createTimer(state, io) {
     const oldTime = state.timer.remainingMs;
     const hardCap = state.config.hardCapMs;
 
-    // Block event top-ups when already at the hard cap
-    if (
-      fromEvent &&
-      ms > 0 &&
-      state.config.hardCapBlockEvents &&
-      hardCap &&
-      hardCap > 0 &&
-      oldTime >= hardCap
-    ) {
+    if (fromEvent && ms > 0 && state.config.hardCapBlockEvents && hardCap && hardCap > 0 && oldTime >= hardCap) {
       console.log(`[Timer] Blocked ${source} add — hard cap reached`);
       return null;
     }

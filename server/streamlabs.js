@@ -68,8 +68,6 @@ function handleDonation(state, timer, eventData) {
 
     if (amount <= 0) continue;
 
-    // Convert to minutes based on config rate
-    // donationDollarsPerMinute = how many GBP per 1 minute of time
     const minutes = amount / config.donationDollarsPerMinute;
 
     // Apply intelligent adjustment

@@ -161,13 +161,7 @@ io.on('connection', (socket) => {
       hardCapMs: state.config.hardCapMs,
       hardCapBlockEvents: state.config.hardCapBlockEvents,
     });
-
-    if (updates.hardCapMs !== undefined) {
-      console.log('[Hard Cap] Set to:', updates.hardCapMs ? `${Math.floor(updates.hardCapMs / 60000)}min` : 'disabled');
-    }
-    if (updates.hardCapBlockEvents !== undefined) {
-      console.log('[Hard Cap] Block events at cap:', updates.hardCapBlockEvents);
-    }
+    console.log('[Hard Cap] Updated:', updates);
   });
 
   // ── Test Events ────────────────────────────────────────────────

@@ -137,16 +137,13 @@ function subTierLevel(tier) {
   return 1;
 }
 
-function applySubTime(state, timer, eventData, { source, logLabel }) {
-  const config = state.config;
-  const adjustment = timer.getTimeAdjustment ? timer.getTimeAdjustment() : 1.0;
-
-  // Gift subs are credited on channel.subscription.gift; recipient subscribe/resub is duplicate
+function applySubTime(config, timer, eventData, source, logLabel) {
   if (eventData.is_gift) {
     console.log(`[Twitch] Skipping gift recipient ${logLabel} (${eventData.user_name || 'Anonymous'})`);
     return;
   }
 
+  const adjustment = timer.getTimeAdjustment();
   const tierLevel = subTierLevel(eventData.tier);
   let minutes = config.tier1SubMinutes;
   if (tierLevel === 2) minutes = config.tier2SubMinutes;
@@ -154,21 +151,16 @@ function applySubTime(state, timer, eventData, { source, logLabel }) {
 
   const adjustedMinutes = minutes * adjustment;
   const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
-
   const userName = eventData.user_name || 'Anonymous';
-  const monthsSuffix =
-    eventData.cumulative_months != null ? `, ${eventData.cumulative_months} months` : '';
-  const adjustmentSuffix = adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : '';
+  const months = eventData.cumulative_months != null ? `, ${eventData.cumulative_months} months` : '';
 
   timer.addTime(
     adjustedMs,
     source,
-    `${userName} (Tier ${tierLevel}${monthsSuffix})${adjustmentSuffix}`,
+    `${userName} (Tier ${tierLevel}${months})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
     true
   );
-  console.log(
-    `[Twitch] ${logLabel} from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`
-  );
+  console.log(`[Twitch] ${logLabel} from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
 }
 
 // ── Process incoming events ───────────────────────────────────
@@ -178,12 +170,12 @@ function handleEvent(state, timer, eventType, eventData) {
 
   switch (eventType) {
     case 'channel.subscribe': {
-      applySubTime(state, timer, eventData, { source: 'Subscription', logLabel: 'Sub' });
+      applySubTime(config, timer, eventData, 'Subscription', 'Sub');
       break;
     }
 
     case 'channel.subscription.message': {
-      applySubTime(state, timer, eventData, { source: 'Resub', logLabel: 'Resub' });
+      applySubTime(config, timer, eventData, 'Resub', 'Resub');
       break;
     }
 
