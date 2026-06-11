@@ -12,6 +12,19 @@ let reconnectTimeout = null;
 let keepaliveTimeout = null;
 let sessionId = null;
 
+function isAllowedReconnectUrl(value) {
+  try {
+    const parsed = new URL(value);
+    const allowedHosts = new Set(['eventsub.wss.twitch.tv']);
+    const isAllowedProtocol = parsed.protocol === 'wss:';
+    const isAllowedHost = allowedHosts.has(parsed.hostname);
+    const isAllowedPort = parsed.port === '' || parsed.port === '443';
+    return isAllowedProtocol && isAllowedHost && isAllowedPort;
+  } catch {
+    return false;
+  }
+}
+
 const TWITCH_WSS_URL = 'wss://eventsub.wss.twitch.tv/ws';
 
 // ── Twitch API helper ─────────────────────────────────────────
@@ -305,6 +318,10 @@ async function connectTwitch(state, timer, setStatus) {
       case 'session_reconnect': {
         const newUrl = msg.payload.session.reconnect_url;
         console.log('[Twitch] Reconnect requested. New URL:', newUrl);
+        if (!isAllowedReconnectUrl(newUrl)) {
+          console.warn('[Twitch] Ignoring reconnect with untrusted URL:', newUrl);
+          break;
+        }
         // Connect to new URL before closing old one
         const oldWs = ws;
         ws = new WebSocket(newUrl);
