@@ -1,8 +1,6 @@
-# Livvy Timer
+# Subathon Timer
 
-**Subathon timer for ObliviosaOfficial's 5th Twitch Anniversary**
-
-A local Node.js subathon timer with a sakura-themed OBS overlay, Twitch EventSub integration, and Streamlabs donation support.
+A local Node.js subathon countdown timer with an OBS overlay, Twitch EventSub integration, and Streamlabs donation support. Configure branding, currency, and theme from the admin panel.
 
 ---
 
@@ -28,7 +26,7 @@ Then:
 1. Go to https://dev.twitch.tv/console
 2. Click **Register Your Application**
 3. Fill in:
-   - **Name**: Anything (e.g., "Livvy Subathon Timer")
+   - **Name**: Anything (e.g., "Subathon Timer")
    - **OAuth Redirect URLs**: `http://localhost:3000`
    - **Category**: Chat Bot (or Other)
 4. Click **Create**
@@ -55,7 +53,7 @@ The server refreshes the access token automatically when `TWITCH_REFRESH_TOKEN` 
 ### 3. Find Your Twitch Broadcaster ID
 
 1. Go to https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
-2. Enter: `ObliviosaOfficial`
+2. Enter your Twitch username
 3. Copy the numeric User ID
 
 ### 4. Get Streamlabs Socket Token
@@ -87,7 +85,7 @@ PORT=3000
 2. Set the URL to: `http://localhost:3000/overlay`
 3. Recommended size: **500 x 200** (adjust to preference)
 4. Check **"Shutdown source when not visible"** is OFF
-5. The background is transparent -- it will layer over your scene
+5. The background is transparent — it will layer over your scene
 
 ---
 
@@ -104,12 +102,20 @@ Open http://localhost:3000/admin in your browser.
 ### Quick Add/Remove
 Add or subtract preset amounts of time with one click.
 
+### Display & Branding
+- **App title**: Shown in the admin header and page titles
+- **Event title**: Shown on the OBS overlay badge; leave blank to hide the badge
+- **Theme**: **Neutral** (clean dark overlay) or **Sakura** (decorative pink/blue theme with petal effects)
+- **Donation currency**: Used for donation rate labels and test events
+
 ### Event Configuration
 Set how much time each event type adds:
 - **Tier 1/2/3 Subs**: Minutes added per subscription tier
 - **Gifted Sub (each)**: Minutes per individual gifted sub
 - **Bits per 1 min**: How many bits equal 1 minute of time
-- **$ per 1 min**: How many dollars of donations equal 1 minute
+- **Currency per 1 min**: How much donation currency equals 1 minute
+
+Click **Save Configuration** to persist event rates and branding settings.
 
 ### Event Log
 Real-time feed showing all events that have added time. Use **Clear** to wipe the log (persisted history is removed from saved state).
@@ -129,7 +135,7 @@ Shows whether Twitch and Streamlabs connections are active.
 | Resub (any tier) | Twitch EventSub | Same minutes as new sub for that tier |
 | Gifted Sub | Twitch EventSub | +5 min each |
 | Bits/Cheers | Twitch EventSub | +1 min per 100 bits |
-| Donations | Streamlabs | +1 min per $1 |
+| Donations | Streamlabs | +1 min per $1 (currency configurable) |
 
 All values are configurable from the admin panel.
 

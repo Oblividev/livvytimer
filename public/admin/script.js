@@ -1,8 +1,17 @@
 /* ═══════════════════════════════════════════════════════════
-   Livvy Timer Admin — Control Panel Script
+   Subathon Timer — Admin Control Panel
    ═══════════════════════════════════════════════════════════ */
 
 const socket = io();
+
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  GBP: '£',
+  EUR: '€',
+  CAD: 'C$',
+  AUD: 'A$',
+  JPY: '¥',
+};
 
 // ── DOM refs ──────────────────────────────────────────────
 
@@ -33,7 +42,17 @@ const cfgTier3 = document.getElementById('cfgTier3');
 const cfgGifted = document.getElementById('cfgGifted');
 const cfgBits = document.getElementById('cfgBits');
 const cfgDonation = document.getElementById('cfgDonation');
+const cfgDonationLabel = document.getElementById('cfgDonationLabel');
+const cfgDonationUnit = document.getElementById('cfgDonationUnit');
 const btnSaveConfig = document.getElementById('btnSaveConfig');
+
+// Display & branding
+const cfgAppTitle = document.getElementById('cfgAppTitle');
+const cfgEventTitle = document.getElementById('cfgEventTitle');
+const cfgTheme = document.getElementById('cfgTheme');
+const cfgDonationCurrency = document.getElementById('cfgDonationCurrency');
+const appTitleHeading = document.getElementById('appTitleHeading');
+const testDonationLabel = document.getElementById('testDonationLabel');
 
 // Target time
 const targetHours = document.getElementById('targetHours');
@@ -153,6 +172,30 @@ function formatStatus(s) {
   return s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
+function getCurrencySymbol(code) {
+  if (!code) return '';
+  const upper = code.toUpperCase();
+  return CURRENCY_SYMBOLS[upper] || upper;
+}
+
+function updateDonationLabels(currency) {
+  const code = (currency || 'USD').toUpperCase();
+  const symbol = getCurrencySymbol(code);
+  cfgDonationLabel.textContent = `${symbol} per 1 min`;
+  cfgDonationUnit.textContent = code;
+  testDonationLabel.textContent = code;
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme === 'sakura' ? 'sakura' : 'neutral';
+}
+
+function applyAppTitle(title) {
+  const resolved = title || 'Subathon Timer';
+  appTitleHeading.textContent = resolved;
+  document.title = `${resolved} - Admin Panel`;
+}
+
 // ── Config ────────────────────────────────────────────────
 
 function populateConfig(config) {
@@ -161,7 +204,16 @@ function populateConfig(config) {
   cfgTier3.value = config.tier3SubMinutes ?? 25;
   cfgGifted.value = config.giftedSubMinutes ?? 5;
   cfgBits.value = config.bitsPerMinute ?? 100;
-  cfgDonation.value = config.donationDollarsPerMinute ?? 1;
+  cfgDonation.value = config.donationAmountPerMinute ?? config.donationDollarsPerMinute ?? 1;
+
+  cfgAppTitle.value = config.appTitle ?? 'Subathon Timer';
+  cfgEventTitle.value = config.eventTitle ?? 'Subathon';
+  cfgTheme.value = config.theme === 'sakura' ? 'sakura' : 'neutral';
+  cfgDonationCurrency.value = config.donationCurrency ?? 'USD';
+
+  updateDonationLabels(config.donationCurrency ?? 'USD');
+  applyTheme(config.theme ?? 'neutral');
+  applyAppTitle(config.appTitle ?? 'Subathon Timer');
 }
 
 function getConfigFromInputs() {
@@ -171,7 +223,11 @@ function getConfigFromInputs() {
     tier3SubMinutes: parseFloat(cfgTier3.value) || 25,
     giftedSubMinutes: parseFloat(cfgGifted.value) || 5,
     bitsPerMinute: parseInt(cfgBits.value) || 100,
-    donationDollarsPerMinute: parseFloat(cfgDonation.value) || 1,
+    donationAmountPerMinute: parseFloat(cfgDonation.value) || 1,
+    appTitle: cfgAppTitle.value.trim() || 'Subathon Timer',
+    eventTitle: cfgEventTitle.value.trim(),
+    theme: cfgTheme.value === 'sakura' ? 'sakura' : 'neutral',
+    donationCurrency: cfgDonationCurrency.value || 'USD',
   };
 }
 
@@ -419,6 +475,10 @@ document.querySelectorAll('.btn-remove').forEach((btn) => {
     const ms = parseInt(btn.dataset.ms);
     socket.emit('timer:removeTime', { ms, source: 'Manual', detail: 'Manual remove' });
   });
+});
+
+cfgDonationCurrency.addEventListener('change', () => {
+  updateDonationLabels(cfgDonationCurrency.value);
 });
 
 // Save config
