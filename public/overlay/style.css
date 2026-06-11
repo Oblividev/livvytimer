@@ -1,28 +1,62 @@
 /* ═══════════════════════════════════════════════════════════
-   Sakura Anniversary — OBS Overlay
-   ObliviosaOfficial 5th Anniversary Subathon Timer
+   Subathon Timer — OBS Overlay
    ═══════════════════════════════════════════════════════════ */
 
-:root {
-  --sakura-blue: #7EC8E3;
-  --sakura-blue-dim: #5BA8C8;
-  --sakura-pink: #FFB7C5;
-  --sakura-pink-hot: #FF8FA3;
-  --soft-lavender: #C5B8D9;
-  --warm-cream: #FFF8F0;
-  --frost-white: rgba(255, 255, 255, 0.10);
-  --frost-border: rgba(126, 200, 227, 0.25);
-  --glow-cyan: #A8E4F0;
-  --glow-pink: #FFD0DC;
-  --pixel-shadow: #2A1B3D;
+[data-theme="neutral"] {
+  --accent: #4FC3F7;
+  --accent-dim: #29B6F6;
+  --accent-secondary: #78909C;
+  --accent-hot: #FF5252;
+  --soft-accent: #90A4AE;
+  --text-light: #ECEFF1;
+  --glow: #81D4FA;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --card-shadow: rgba(0, 0, 0, 0.35);
+  --frost-border: rgba(255, 255, 255, 0.12);
+  --glass-bg: rgba(18, 18, 24, 0.88);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.4);
+  --text-outline: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.6);
+  --text-outline-soft: 0 1px 3px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --digit-font: 'JetBrains Mono', monospace;
+  --label-font: 'JetBrains Mono', monospace;
+}
+
+[data-theme="sakura"] {
+  --accent: #7EC8E3;
+  --accent-dim: #5BA8C8;
+  --accent-secondary: #FFB7C5;
+  --accent-hot: #FF8FA3;
+  --soft-accent: #C5B8D9;
+  --text-light: #FFF8F0;
+  --glow: #A8E4F0;
+  --shadow: rgba(42, 27, 61, 0.25);
   --card-shadow: rgba(42, 27, 61, 0.25);
+  --frost-border: rgba(126, 200, 227, 0.25);
   --glass-bg: rgba(255, 248, 240, 0.22);
-  --glass-bg-strong: rgba(255, 248, 240, 0.38);
-  --glass-border: rgba(255, 255, 255, 0.45);
   --glass-highlight: rgba(255, 255, 255, 0.55);
   --glass-shadow: rgba(42, 27, 61, 0.35);
   --text-outline: 0 1px 2px rgba(42, 27, 61, 0.95), 0 2px 8px rgba(42, 27, 61, 0.65);
   --text-outline-soft: 0 1px 3px rgba(42, 27, 61, 0.82), 0 2px 6px rgba(42, 27, 61, 0.45);
+  --digit-font: 'Zen Maru Gothic', sans-serif;
+  --label-font: 'DotGothic16', monospace;
+}
+
+.theme-sakura-only {
+  display: none !important;
+}
+
+[data-theme="sakura"] .petals-container.theme-sakura-only,
+[data-theme="sakura"] .burst-container.theme-sakura-only {
+  display: block !important;
+}
+
+[data-theme="sakura"] .sakura-branch.theme-sakura-only {
+  display: block !important;
+}
+
+[data-theme="sakura"] .badge-flower.theme-sakura-only {
+  display: inline !important;
 }
 
 /* ── Reset & Canvas ──────────────────────────────────────── */
@@ -52,14 +86,7 @@ body {
 .timer-card {
   position: relative;
   isolation: isolate;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 248, 240, 0.24) 0%,
-      rgba(126, 200, 227, 0.22) 35%,
-      rgba(197, 184, 217, 0.18) 65%,
-      rgba(255, 183, 197, 0.22) 100%
-    );
+  background: var(--glass-bg);
   backdrop-filter: blur(24px) saturate(1.45);
   -webkit-backdrop-filter: blur(24px) saturate(1.45);
   border: 1px solid var(--frost-border);
@@ -69,11 +96,25 @@ body {
   text-align: center;
   box-shadow:
     0 8px 32px var(--glass-shadow),
-    0 2px 8px rgba(42, 27, 61, 0.18),
-    inset 0 1px 0 var(--glass-highlight),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    0 2px 8px var(--card-shadow),
+    inset 0 1px 0 var(--glass-highlight);
   overflow: hidden;
+}
+
+[data-theme="sakura"] .timer-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 248, 240, 0.24) 0%,
+      rgba(126, 200, 227, 0.22) 35%,
+      rgba(197, 184, 217, 0.18) 65%,
+      rgba(255, 183, 197, 0.22) 100%
+    );
   animation: cardFloat 6s ease-in-out infinite;
+}
+
+[data-theme="neutral"] .timer-card {
+  background: rgba(18, 18, 24, 0.9);
 }
 
 .timer-card::before {
@@ -82,8 +123,8 @@ body {
   inset: 0;
   border-radius: inherit;
   background:
-    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 255, 255, 0.42), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 42%);
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 255, 255, 0.15), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 42%);
   pointer-events: none;
   z-index: 0;
 }
@@ -93,7 +134,7 @@ body {
   position: absolute;
   inset: 1px;
   border-radius: 21px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   pointer-events: none;
   z-index: 0;
 }
@@ -129,12 +170,27 @@ body {
   50% { opacity: 0.75; transform: scale(1.08); }
 }
 
-/* ── Anniversary Badge ───────────────────────────────────── */
+/* ── Event Badge ─────────────────────────────────────────── */
 
-.anniversary-badge {
+.event-badge {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--frost-border);
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-bottom: 10px;
+  font-family: var(--label-font);
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  text-shadow: var(--text-outline-soft);
+  box-shadow: 0 2px 14px var(--card-shadow);
+}
+
+[data-theme="sakura"] .event-badge {
   background:
     linear-gradient(
       90deg,
@@ -142,25 +198,12 @@ body {
       rgba(255, 183, 197, 0.32),
       rgba(197, 184, 217, 0.28)
     );
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid rgba(255, 183, 197, 0.45);
-  border-radius: 999px;
-  padding: 6px 16px;
-  margin-bottom: 10px;
-  font-family: 'DotGothic16', monospace;
-  font-size: 12px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--warm-cream);
-  text-shadow:
-    var(--text-outline-soft),
-    0 0 14px rgba(255, 183, 197, 0.75),
-    0 0 28px rgba(126, 200, 227, 0.3);
-  box-shadow:
-    0 2px 14px rgba(42, 27, 61, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 183, 197, 0.45);
   animation: badgeGlow 3s ease-in-out infinite;
+}
+
+.event-badge.hidden {
+  display: none;
 }
 
 .badge-flower {
@@ -179,23 +222,10 @@ body {
 
 @keyframes badgeGlow {
   0%, 100% {
-    text-shadow:
-      var(--text-outline-soft),
-      0 0 14px rgba(255, 183, 197, 0.75),
-      0 0 28px rgba(126, 200, 227, 0.3);
-    box-shadow:
-      0 2px 14px rgba(42, 27, 61, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    box-shadow: 0 2px 14px var(--card-shadow);
   }
   50% {
-    text-shadow:
-      var(--text-outline-soft),
-      0 0 20px rgba(255, 183, 197, 0.9),
-      0 0 40px rgba(126, 200, 227, 0.45);
-    box-shadow:
-      0 4px 18px rgba(255, 183, 197, 0.22),
-      0 2px 14px rgba(42, 27, 61, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    box-shadow: 0 4px 18px rgba(255, 183, 197, 0.22), 0 2px 14px var(--card-shadow);
   }
 }
 
@@ -210,6 +240,12 @@ body {
   margin-top: 2px;
   padding: 10px 18px 12px;
   border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--frost-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="sakura"] .countdown {
   background:
     linear-gradient(
       180deg,
@@ -217,45 +253,41 @@ body {
       rgba(42, 27, 61, 0.24) 45%,
       rgba(255, 183, 197, 0.14) 100%
     );
-  backdrop-filter: blur(10px) saturate(1.2);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2);
-  border: 1px solid rgba(126, 200, 227, 0.28);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 4px 16px rgba(42, 27, 61, 0.18),
-    0 0 24px rgba(126, 200, 227, 0.08);
 }
 
 .digit-group {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  font-weight: 900;
+  font-family: var(--digit-font);
+  font-weight: 700;
   font-size: 64px;
   line-height: 1;
-  color: var(--warm-cream);
+  color: var(--text-light);
   text-shadow:
     var(--text-outline-soft),
-    0 0 20px rgba(168, 228, 240, 0.65),
-    0 0 40px rgba(168, 228, 240, 0.35),
-    0 2px 4px var(--card-shadow);
+    0 0 20px rgba(129, 212, 250, 0.45);
   min-width: 85px;
   display: inline-block;
   text-align: center;
-  animation: digitGlow 3s ease-in-out infinite;
   transition: color 0.5s ease, text-shadow 0.5s ease;
 }
 
+[data-theme="sakura"] .digit-group {
+  font-weight: 900;
+  animation: digitGlow 3s ease-in-out infinite;
+}
+
 .separator {
-  font-family: 'Zen Maru Gothic', sans-serif;
+  font-family: var(--digit-font);
   font-weight: 700;
   font-size: 52px;
-  color: var(--sakura-blue);
+  color: var(--accent);
   opacity: 0.85;
-  text-shadow:
-    var(--text-outline-soft),
-    0 0 15px rgba(126, 200, 227, 0.6);
-  animation: separatorPulse 1s steps(2, start) infinite;
+  text-shadow: var(--text-outline-soft);
   position: relative;
   top: -3px;
+}
+
+[data-theme="sakura"] .separator {
+  animation: separatorPulse 1s steps(2, start) infinite;
 }
 
 @keyframes digitGlow {
@@ -263,16 +295,13 @@ body {
     text-shadow:
       var(--text-outline-soft),
       0 0 20px rgba(168, 228, 240, 0.65),
-      0 0 40px rgba(168, 228, 240, 0.35),
-      0 2px 4px var(--card-shadow);
+      0 0 40px rgba(168, 228, 240, 0.35);
   }
   50% {
     text-shadow:
       var(--text-outline-soft),
       0 0 28px rgba(168, 228, 240, 0.85),
-      0 0 55px rgba(168, 228, 240, 0.45),
-      0 0 80px rgba(126, 200, 227, 0.15),
-      0 2px 4px var(--card-shadow);
+      0 0 55px rgba(168, 228, 240, 0.45);
   }
 }
 
@@ -284,39 +313,15 @@ body {
 /* ── Critical State (< 5 min) ────────────────────────────── */
 
 .timer-card.critical .digit-group {
-  color: var(--sakura-pink-hot);
-  text-shadow:
-    var(--text-outline-soft),
-    0 0 22px rgba(255, 143, 163, 0.75),
-    0 0 44px rgba(255, 183, 197, 0.4),
-    0 2px 4px var(--card-shadow);
+  color: var(--accent-hot);
   animation: criticalPulse 0.8s ease-in-out infinite;
 }
 
 .timer-card.critical .separator {
-  color: var(--sakura-pink-hot);
-  text-shadow:
-    var(--text-outline-soft),
-    0 0 15px rgba(255, 143, 163, 0.6);
+  color: var(--accent-hot);
 }
 
-.timer-card.critical .countdown {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 143, 163, 0.18) 0%,
-      rgba(42, 27, 61, 0.28) 45%,
-      rgba(255, 183, 197, 0.16) 100%
-    );
-  border-color: rgba(255, 143, 163, 0.4);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 4px 16px rgba(42, 27, 61, 0.18),
-    0 0 28px rgba(255, 143, 163, 0.12);
-}
-
-.timer-card.critical {
-  border-color: rgba(255, 143, 163, 0.4);
+[data-theme="sakura"] .timer-card.critical {
   animation: criticalShake 0.4s ease-in-out infinite, cardFloat 6s ease-in-out infinite;
 }
 
@@ -324,17 +329,12 @@ body {
   0%, 100% {
     text-shadow:
       var(--text-outline-soft),
-      0 0 22px rgba(255, 143, 163, 0.75),
-      0 0 44px rgba(255, 183, 197, 0.4),
-      0 2px 4px var(--card-shadow);
+      0 0 22px rgba(255, 82, 82, 0.65);
   }
   50% {
     text-shadow:
       var(--text-outline-soft),
-      0 0 32px rgba(255, 143, 163, 0.95),
-      0 0 64px rgba(255, 183, 197, 0.5),
-      0 0 90px rgba(255, 183, 197, 0.2),
-      0 2px 4px var(--card-shadow);
+      0 0 32px rgba(255, 82, 82, 0.9);
   }
 }
 
@@ -352,7 +352,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(42, 27, 61, 0.3);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
   border-radius: 20px;
   opacity: 0;
@@ -361,11 +361,11 @@ body {
 }
 
 .paused-overlay span {
-  font-family: 'DotGothic16', monospace;
+  font-family: var(--label-font);
   font-size: 22px;
   letter-spacing: 6px;
-  color: var(--soft-lavender);
-  text-shadow: 0 0 20px rgba(197, 184, 217, 0.6);
+  color: var(--soft-accent);
+  text-shadow: 0 0 20px rgba(144, 164, 174, 0.5);
   animation: pausedBlink 2s ease-in-out infinite;
 }
 
@@ -406,12 +406,8 @@ body {
     opacity: 0;
     transform: translateY(-20px) translateX(0px) rotate(0deg) scale(0.8);
   }
-  10% {
-    opacity: 0.7;
-  }
-  90% {
-    opacity: 0.5;
-  }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.5; }
   100% {
     opacity: 0;
     transform: translateY(calc(100vh + 20px)) translateX(var(--drift-x, 40px)) rotate(var(--drift-rot, 360deg)) scale(0.6);
@@ -451,12 +447,8 @@ body {
     opacity: 0;
     transform: translateY(0) translateX(0) rotate(0deg) scale(1);
   }
-  8% {
-    opacity: 0.9;
-  }
-  70% {
-    opacity: 0.6;
-  }
+  8% { opacity: 0.9; }
+  70% { opacity: 0.6; }
   100% {
     opacity: 0;
     transform: translateY(calc(100vh + 40px)) translateX(var(--burst-x, 30px)) rotate(var(--burst-rot, 540deg)) scale(0.4);
@@ -484,6 +476,12 @@ body {
   min-width: 220px;
   padding: 18px 32px 16px;
   border-radius: 18px;
+  background: rgba(18, 18, 24, 0.92);
+  border: 1px solid var(--frost-border);
+  box-shadow: 0 12px 40px var(--glass-shadow);
+}
+
+[data-theme="sakura"] .event-toast {
   background:
     linear-gradient(
       145deg,
@@ -491,14 +489,7 @@ body {
       rgba(255, 248, 240, 0.36) 42%,
       rgba(255, 183, 197, 0.38) 100%
     );
-  backdrop-filter: blur(22px) saturate(1.4);
-  -webkit-backdrop-filter: blur(22px) saturate(1.4);
-  border: 1px solid rgba(255, 183, 197, 0.48);
-  box-shadow:
-    0 12px 40px rgba(42, 27, 61, 0.32),
-    0 4px 12px rgba(42, 27, 61, 0.18),
-    0 0 32px rgba(255, 183, 197, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 183, 197, 0.48);
 }
 
 .event-toast.show {
@@ -506,27 +497,21 @@ body {
 }
 
 .event-toast-amount {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  font-weight: 900;
+  font-family: var(--digit-font);
+  font-weight: 700;
   font-size: 40px;
   line-height: 1;
-  color: var(--sakura-pink-hot);
-  text-shadow:
-    var(--text-outline-soft),
-    0 0 22px rgba(255, 183, 197, 0.85),
-    0 0 44px rgba(255, 183, 197, 0.45),
-    0 2px 6px var(--card-shadow);
+  color: var(--accent-hot);
+  text-shadow: var(--text-outline-soft);
 }
 
 .event-toast-label {
-  font-family: 'DotGothic16', monospace;
+  font-family: var(--label-font);
   font-size: 15px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--glow-cyan);
-  text-shadow:
-    var(--text-outline-soft),
-    0 0 14px rgba(168, 228, 240, 0.75);
+  color: var(--glow);
+  text-shadow: var(--text-outline-soft);
 }
 
 @keyframes toastShow {
@@ -563,9 +548,8 @@ body {
   opacity: 0.3;
 }
 
-.timer-card.expired {
+[data-theme="sakura"] .timer-card.expired {
   animation: none;
-  border-color: rgba(197, 184, 217, 0.2);
 }
 
 /* ── Idle / Not Running State ────────────────────────────── */

@@ -3,6 +3,15 @@ const path = require('path');
 
 const STATE_PATH = path.join(__dirname, '..', 'data', 'state.json');
 
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  GBP: '£',
+  EUR: '€',
+  CAD: 'C$',
+  AUD: 'A$',
+  JPY: '¥',
+};
+
 const DEFAULT_STATE = {
   timer: {
     remainingMs: 0,
@@ -16,23 +25,49 @@ const DEFAULT_STATE = {
     tier3SubMinutes: 25,
     giftedSubMinutes: 5,
     bitsPerMinute: 100,
-    donationDollarsPerMinute: 1,
-    targetTimeMs: null, // Target time in milliseconds (null = disabled)
-    hardCapMs: null, // Hard cap maximum time in milliseconds (null = disabled)
-    hardCapBlockEvents: true, // When at cap, block event-based time additions
+    donationAmountPerMinute: 1,
+    donationCurrency: 'USD',
+    eventTitle: 'Subathon',
+    appTitle: 'Subathon Timer',
+    theme: 'neutral',
+    targetTimeMs: null,
+    hardCapMs: null,
+    hardCapBlockEvents: true,
   },
   eventLog: [],
 };
+
+function getCurrencySymbol(code) {
+  if (!code) return '';
+  const upper = code.toUpperCase();
+  return CURRENCY_SYMBOLS[upper] || upper;
+}
+
+function normalizeConfig(config) {
+  const input = { ...(config || {}) };
+
+  if (input.donationAmountPerMinute === undefined && input.donationDollarsPerMinute !== undefined) {
+    input.donationAmountPerMinute = input.donationDollarsPerMinute;
+  }
+  delete input.donationDollarsPerMinute;
+
+  const merged = { ...DEFAULT_STATE.config, ...input };
+
+  if (!['neutral', 'sakura'].includes(merged.theme)) {
+    merged.theme = DEFAULT_STATE.config.theme;
+  }
+
+  return merged;
+}
 
 function loadState() {
   try {
     if (fs.existsSync(STATE_PATH)) {
       const raw = fs.readFileSync(STATE_PATH, 'utf-8');
       const parsed = JSON.parse(raw);
-      // Merge with defaults so new fields are always present
       return {
         timer: { ...DEFAULT_STATE.timer, ...parsed.timer },
-        config: { ...DEFAULT_STATE.config, ...parsed.config },
+        config: normalizeConfig(parsed.config || {}),
         eventLog: parsed.eventLog || [],
       };
     }
@@ -48,9 +83,9 @@ function saveState(state) {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    // Keep only the last 200 events to prevent unbounded growth
     const trimmed = {
       ...state,
+      config: normalizeConfig(state.config || {}),
       eventLog: (state.eventLog || []).slice(-200),
     };
     fs.writeFileSync(STATE_PATH, JSON.stringify(trimmed, null, 2), 'utf-8');
@@ -64,7 +99,7 @@ function getConfig(state) {
 }
 
 function updateConfig(state, newConfig) {
-  state.config = { ...state.config, ...newConfig };
+  state.config = normalizeConfig({ ...state.config, ...newConfig });
   saveState(state);
   return state.config;
 }
@@ -74,5 +109,6 @@ module.exports = {
   saveState,
   getConfig,
   updateConfig,
+  getCurrencySymbol,
   DEFAULT_STATE,
 };
