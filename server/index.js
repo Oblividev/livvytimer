@@ -189,12 +189,14 @@ io.on('connection', (socket) => {
 
   socket.on('test:giftedSubs', (data) => {
     const total = data.total || 1;
+    const tier = data.tier || '1000';
     const userName = data.userName || 'TestUser';
     handleEvent(state, timer, 'channel.subscription.gift', {
       total: total,
+      tier: tier,
       user_name: userName,
     });
-    console.log(`[Test] Simulated ${total} gifted sub(s) from ${userName}`);
+    console.log(`[Test] Simulated ${total} Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'} gifted sub(s) from ${userName}`);
   });
 
   socket.on('test:bits', (data) => {
