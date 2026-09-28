@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="neutral">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Livvy Timer - Admin Panel</title>
+  <title>Subathon Timer - Admin Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
     <!-- Header -->
     <header class="admin-header">
       <div class="header-brand">
-        <svg class="header-flower" viewBox="0 0 20 20" width="22" height="22">
+        <svg class="header-flower theme-sakura-only" viewBox="0 0 20 20" width="22" height="22">
           <circle cx="10" cy="6" r="4" fill="#FFB7C5" opacity="0.8"/>
           <circle cx="13.8" cy="8.5" r="4" fill="#FFB7C5" opacity="0.7"/>
           <circle cx="12.4" cy="12.8" r="4" fill="#FFB7C5" opacity="0.8"/>
@@ -23,7 +23,7 @@
           <circle cx="6.2" cy="8.5" r="4" fill="#FFB7C5" opacity="0.8"/>
           <circle cx="10" cy="10" r="2.5" fill="#FFF8F0" opacity="0.9"/>
         </svg>
-        <h1>Livvy Timer</h1>
+        <h1 id="appTitleHeading">Subathon Timer</h1>
         <span class="header-badge">Admin</span>
       </div>
       <div class="header-connections">
@@ -167,6 +167,40 @@
         </div>
       </section>
 
+      <!-- Display & Branding -->
+      <section class="card">
+        <h2 class="card-title">Display &amp; Branding</h2>
+        <p class="card-desc">Customize the overlay and admin panel appearance. Event title appears on the OBS overlay badge; leave blank to hide it.</p>
+        <div class="branding-grid">
+          <div class="branding-field">
+            <label for="cfgAppTitle">App title</label>
+            <input type="text" id="cfgAppTitle" value="Subathon Timer" maxlength="60">
+          </div>
+          <div class="branding-field">
+            <label for="cfgEventTitle">Event title</label>
+            <input type="text" id="cfgEventTitle" value="Subathon" maxlength="80" placeholder="e.g. 24-Hour Charity Stream">
+          </div>
+          <div class="branding-field">
+            <label for="cfgTheme">Theme</label>
+            <select id="cfgTheme">
+              <option value="neutral">Neutral</option>
+              <option value="sakura">Sakura</option>
+            </select>
+          </div>
+          <div class="branding-field">
+            <label for="cfgDonationCurrency">Donation currency</label>
+            <select id="cfgDonationCurrency">
+              <option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="CAD">CAD (C$)</option>
+              <option value="AUD">AUD (A$)</option>
+              <option value="JPY">JPY (¥)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
       <!-- Event Configuration -->
       <section class="card">
         <h2 class="card-title">Event Configuration</h2>
@@ -208,10 +242,10 @@
             </div>
           </div>
           <div class="config-item">
-            <label for="cfgDonation">£ per 1 min</label>
+            <label for="cfgDonation" id="cfgDonationLabel">$ per 1 min</label>
             <div class="config-input">
               <input type="number" id="cfgDonation" min="0.01" step="0.01" value="1">
-              <span>GBP</span>
+              <span id="cfgDonationUnit">USD</span>
             </div>
           </div>
         </div>
@@ -256,7 +290,7 @@
             <label>Donation</label>
             <div class="test-event-input-row">
               <input type="number" id="testDonationAmount" min="0.01" step="0.01" value="1.00" class="test-input">
-              <span class="test-input-label">GBP</span>
+              <span class="test-input-label" id="testDonationLabel">USD</span>
               <button class="btn btn-test" id="testDonation">Donate</button>
             </div>
           </div>

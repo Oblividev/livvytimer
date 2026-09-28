@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Sakura Anniversary — Overlay Script
+   Subathon Timer — Overlay Script
    ═══════════════════════════════════════════════════════════ */
 
 const socket = io();
@@ -15,20 +15,23 @@ const burstContainer = document.getElementById('burstContainer');
 const eventToast = document.getElementById('eventToast');
 const eventAmount = document.getElementById('eventAmount');
 const eventLabel = document.getElementById('eventLabel');
+const eventBadge = document.getElementById('eventBadge');
+const eventTitleEl = document.getElementById('eventTitle');
 
 // ── State ─────────────────────────────────────────────────
 let currentState = { remainingMs: 0, isRunning: false, isPaused: false };
+let currentTheme = 'neutral';
 let toastTimeout = null;
+let ambientPetalsStarted = false;
 
 // ── Petal SVG template ────────────────────────────────────
-function createPetalSVG(hue) {
-  // Randomize between blue-ish and pink-ish petals
+function createPetalSVG() {
   const colors = [
-    { fill: '#7EC8E3', opacity: 0.7 },   // sakura blue
-    { fill: '#A8E4F0', opacity: 0.6 },   // light cyan
-    { fill: '#FFB7C5', opacity: 0.65 },  // sakura pink
-    { fill: '#C5B8D9', opacity: 0.55 },  // lavender
-    { fill: '#FFD0DC', opacity: 0.6 },   // soft pink
+    { fill: '#7EC8E3', opacity: 0.7 },
+    { fill: '#A8E4F0', opacity: 0.6 },
+    { fill: '#FFB7C5', opacity: 0.65 },
+    { fill: '#C5B8D9', opacity: 0.55 },
+    { fill: '#FFD0DC', opacity: 0.6 },
   ];
   const c = colors[Math.floor(Math.random() * colors.length)];
   return `<svg viewBox="0 0 12 10" xmlns="http://www.w3.org/2000/svg">
@@ -37,8 +40,18 @@ function createPetalSVG(hue) {
   </svg>`;
 }
 
+function clearPetals() {
+  petalsContainer.innerHTML = '';
+  burstContainer.innerHTML = '';
+  ambientPetalsStarted = false;
+}
+
 // ── Ambient petals ────────────────────────────────────────
 function spawnAmbientPetals() {
+  if (ambientPetalsStarted || currentTheme !== 'sakura') return;
+  ambientPetalsStarted = true;
+  petalsContainer.innerHTML = '';
+
   const count = 10;
   for (let i = 0; i < count; i++) {
     const petal = document.createElement('div');
@@ -68,6 +81,8 @@ function spawnAmbientPetals() {
 
 // ── Burst petals (event triggered) ────────────────────────
 function triggerBurst() {
+  if (currentTheme !== 'sakura') return;
+
   const count = 18;
   for (let i = 0; i < count; i++) {
     const petal = document.createElement('div');
@@ -92,10 +107,33 @@ function triggerBurst() {
     petal.classList.add('falling');
     burstContainer.appendChild(petal);
 
-    // Clean up after animation
     setTimeout(() => {
       petal.remove();
     }, (duration + delay + 0.5) * 1000);
+  }
+}
+
+// ── Display config ────────────────────────────────────────
+function applyDisplayConfig(config) {
+  const theme = config.theme === 'sakura' ? 'sakura' : 'neutral';
+  const eventTitle = (config.eventTitle || '').trim();
+  const appTitle = config.appTitle || 'Subathon Timer';
+
+  document.documentElement.dataset.theme = theme;
+  document.title = `${appTitle} - Overlay`;
+
+  eventTitleEl.textContent = eventTitle || 'Subathon';
+  eventBadge.classList.toggle('hidden', !eventTitle);
+
+  if (theme !== currentTheme) {
+    currentTheme = theme;
+    if (theme === 'sakura') {
+      spawnAmbientPetals();
+    } else {
+      clearPetals();
+    }
+  } else if (theme === 'sakura' && !ambientPetalsStarted) {
+    spawnAmbientPetals();
   }
 }
 
@@ -132,12 +170,10 @@ function updateDisplay(data) {
   minutesEl.textContent = time.minutes;
   secondsEl.textContent = time.seconds;
 
-  // State classes
   timerCard.classList.toggle('critical', isRunning && !isPaused && remainingMs > 0 && remainingMs < 300000);
   timerCard.classList.toggle('expired', isRunning && remainingMs <= 0);
   timerCard.classList.toggle('idle', !isRunning);
 
-  // Paused overlay
   pausedOverlay.classList.toggle('visible', isPaused);
 }
 
@@ -154,15 +190,12 @@ function showEventToast(eventData) {
 
   eventAmount.textContent = timeStr;
 
-  // Build label from source + detail
   let label = eventData.source || '';
   if (eventData.detail) label = eventData.detail;
   eventLabel.textContent = label;
 
-  // Trigger burst
   triggerBurst();
 
-  // Force reflow for animation restart
   void eventToast.offsetWidth;
   eventToast.classList.add('show');
 
@@ -173,6 +206,7 @@ function showEventToast(eventData) {
 
 // ── Socket.IO events ──────────────────────────────────────
 socket.on('timer:update', updateDisplay);
+socket.on('config:update', applyDisplayConfig);
 
 socket.on('timer:event', (eventData) => {
   if (eventData.type === 'add') {
@@ -182,7 +216,7 @@ socket.on('timer:event', (eventData) => {
 
 socket.on('timer:expired', () => {
   timerCard.classList.add('expired');
-  triggerBurst(); // Final dramatic burst
+  triggerBurst();
 });
 
 socket.on('connect', () => {
@@ -192,6 +226,3 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
   console.log('[Overlay] Disconnected from server');
 });
-
-// ── Init ──────────────────────────────────────────────────
-spawnAmbientPetals();

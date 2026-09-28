@@ -1,7 +1,7 @@
 {
-  "name": "livvytimer",
+  "name": "subathon-timer",
   "version": "1.0.0",
-  "description": "Subathon timer for ObliviosaOfficial's 5th Twitch Anniversary",
+  "description": "Local subathon countdown timer with OBS overlay, Twitch EventSub, and Streamlabs donations",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

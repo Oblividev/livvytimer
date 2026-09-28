@@ -1,12 +1,37 @@
 /* ═══════════════════════════════════════════════════════════
-   Livvy Timer Admin — Sakura Theme
+   Subathon Timer — Admin Panel
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --sakura-blue: #7EC8E3;
-  --sakura-pink: #FFB7C5;
-  --sakura-pink-hot: #FF8FA3;
-  --soft-lavender: #C5B8D9;
+  --green: #7EDDA9;
+  --red: #FF8A8A;
+  --yellow: #FFD88A;
+  --orange: #FFB07A;
+}
+
+[data-theme="neutral"] {
+  --accent: #4FC3F7;
+  --accent-hot: #FF5252;
+  --accent-secondary: #90A4AE;
+  --soft-accent: #78909C;
+  --warm-cream: #ECEFF1;
+
+  --bg-deep: #121218;
+  --bg-card: #1A1A22;
+  --bg-card-hover: #22222C;
+  --bg-input: #121218;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(79, 195, 247, 0.45);
+  --text-primary: #ECEFF1;
+  --text-secondary: #90A4AE;
+  --text-dim: #607D8B;
+}
+
+[data-theme="sakura"] {
+  --accent: #7EC8E3;
+  --accent-hot: #FF8FA3;
+  --accent-secondary: #C5B8D9;
+  --soft-accent: #C5B8D9;
   --warm-cream: #FFF8F0;
 
   --bg-deep: #1A1225;
@@ -18,11 +43,18 @@
   --text-primary: #EDE6F5;
   --text-secondary: #9B8FB5;
   --text-dim: #6B5F80;
+}
 
-  --green: #7EDDA9;
-  --red: #FF8A8A;
-  --yellow: #FFD88A;
-  --orange: #FFB07A;
+.theme-sakura-only {
+  display: none !important;
+}
+
+[data-theme="sakura"] .theme-sakura-only {
+  display: block !important;
+}
+
+[data-theme="sakura"] .header-flower.theme-sakura-only {
+  display: inline !important;
 }
 
 /* ── Reset ───────────────────────────────────────────────── */
@@ -83,7 +115,7 @@ body {
   font-size: 0.7rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--sakura-pink);
+  color: var(--accent);
   background: rgba(255, 183, 197, 0.1);
   border: 1px solid rgba(255, 183, 197, 0.25);
   border-radius: 10px;
@@ -180,7 +212,7 @@ body {
   font-size: 0.85rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--sakura-blue);
+  color: var(--accent);
   margin-bottom: 16px;
 }
 
@@ -189,7 +221,7 @@ body {
   font-size: 0.75rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--soft-lavender);
+  color: var(--soft-accent);
   margin: 16px 0 10px;
 }
 
@@ -217,7 +249,7 @@ body {
 }
 
 .timer-display.critical {
-  color: var(--sakura-pink-hot);
+  color: var(--accent-hot);
   text-shadow: 0 0 20px rgba(255, 143, 163, 0.5);
 }
 
@@ -226,7 +258,7 @@ body {
 }
 
 .timer-sep {
-  color: var(--sakura-blue);
+  color: var(--accent);
   opacity: 0.5;
   margin: 0 2px;
 }
@@ -300,7 +332,7 @@ body {
 
 .btn-resume {
   border-color: rgba(126, 200, 227, 0.3);
-  color: var(--sakura-blue);
+  color: var(--accent);
 }
 .btn-resume:hover {
   background: rgba(126, 200, 227, 0.08);
@@ -318,7 +350,7 @@ body {
 
 .btn-reset {
   border-color: rgba(197, 184, 217, 0.3);
-  color: var(--soft-lavender);
+  color: var(--soft-accent);
 }
 .btn-reset:hover {
   background: rgba(197, 184, 217, 0.08);
@@ -337,7 +369,7 @@ body {
 
 .btn-add {
   border-color: rgba(126, 200, 227, 0.3);
-  color: var(--sakura-blue);
+  color: var(--accent);
   font-size: 0.8rem;
   padding: 6px 12px;
 }
@@ -348,7 +380,7 @@ body {
 
 .btn-remove {
   border-color: rgba(255, 183, 197, 0.3);
-  color: var(--sakura-pink);
+  color: var(--accent);
   font-size: 0.8rem;
   padding: 6px 12px;
 }
@@ -359,7 +391,7 @@ body {
 
 .btn-save {
   border-color: rgba(126, 200, 227, 0.3);
-  color: var(--sakura-blue);
+  color: var(--accent);
   margin-top: 16px;
   width: 100%;
 }
@@ -493,6 +525,46 @@ body {
   letter-spacing: 1px;
 }
 
+/* ── Branding Grid ───────────────────────────────────────── */
+
+.branding-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.branding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branding-field label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.branding-field input,
+.branding-field select {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 0.95rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.branding-field input:focus,
+.branding-field select:focus {
+  border-color: var(--border-focus);
+}
+
 /* ── Target Status ───────────────────────────────────────── */
 
 .target-status {
@@ -531,7 +603,7 @@ body {
 }
 
 .target-value.reduce {
-  color: var(--sakura-pink);
+  color: var(--accent);
 }
 
 .card-header-row {
@@ -615,11 +687,11 @@ body {
 }
 
 .log-time-added.add {
-  color: var(--sakura-blue);
+  color: var(--accent);
 }
 
 .log-time-added.remove {
-  color: var(--sakura-pink);
+  color: var(--accent);
 }
 
 .log-detail {
@@ -633,7 +705,7 @@ body {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--soft-lavender);
+  color: var(--soft-accent);
   background: rgba(197, 184, 217, 0.1);
   border-radius: 6px;
   padding: 2px 8px;
@@ -725,7 +797,7 @@ body {
 
 .btn-test {
   border-color: rgba(197, 184, 217, 0.3);
-  color: var(--soft-lavender);
+  color: var(--soft-accent);
   font-size: 0.8rem;
   padding: 6px 14px;
 }
