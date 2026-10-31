@@ -63,14 +63,13 @@ function handleDonation(state, timer, eventData) {
   for (const donation of eventData.message) {
     const amount = parseFloat(donation.amount) || 0;
     const name = donation.name || 'Anonymous';
-    const currency = donation.currency || 'GBP';
+    const currency = donation.currency || config.donationCurrency || 'USD';
     const formattedAmount = donation.formatted_amount || `${currency} ${amount.toFixed(2)}`;
 
     if (amount <= 0) continue;
 
-    // Convert to minutes based on config rate
-    // donationDollarsPerMinute = how many GBP per 1 minute of time
-    const minutes = amount / config.donationDollarsPerMinute;
+    const rate = config.donationAmountPerMinute || 1;
+    const minutes = amount / rate;
 
     // Apply intelligent adjustment
     const adjustedMinutes = minutes * adjustment;

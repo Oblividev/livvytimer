@@ -12,6 +12,19 @@ let reconnectTimeout = null;
 let keepaliveTimeout = null;
 let sessionId = null;
 
+function isAllowedReconnectUrl(value) {
+  try {
+    const parsed = new URL(value);
+    const allowedHosts = new Set(['eventsub.wss.twitch.tv']);
+    const isAllowedProtocol = parsed.protocol === 'wss:';
+    const isAllowedHost = allowedHosts.has(parsed.hostname);
+    const isAllowedPort = parsed.port === '' || parsed.port === '443';
+    return isAllowedProtocol && isAllowedHost && isAllowedPort;
+  } catch {
+    return false;
+  }
+}
+
 const TWITCH_WSS_URL = 'wss://eventsub.wss.twitch.tv/ws';
 
 // ── Twitch API helper ─────────────────────────────────────────
@@ -129,46 +142,50 @@ async function subscribeToEvents(sessionId, clientId, broadcasterId) {
   }
 }
 
+function resolveTier(eventData) {
+  return eventData.tier ?? eventData.sub_tier;
+}
+
 // Twitch sends tier as "1000"|"2000"|"3000" (string) or 1000|2000|3000 (number)
 function subTierLevel(tier) {
   const n = Number(tier);
-  if (n === 2000) return 2;
-  if (n === 3000) return 3;
+  if (n === 2 || n === 2000) return 2;
+  if (n === 3 || n === 3000) return 3;
   return 1;
 }
 
-function applySubTime(state, timer, eventData, { source, logLabel }) {
-  const config = state.config;
-  const adjustment = timer.getTimeAdjustment ? timer.getTimeAdjustment() : 1.0;
+function minutesForSubTier(config, tier) {
+  const tierLevel = subTierLevel(tier);
+  if (tierLevel === 2) return config.tier2SubMinutes;
+  if (tierLevel === 3) return config.tier3SubMinutes;
+  return config.tier1SubMinutes;
+}
 
-  // Gift subs are credited on channel.subscription.gift; recipient subscribe/resub is duplicate
+function applySubTime(config, timer, eventData, source, logLabel) {
   if (eventData.is_gift) {
     console.log(`[Twitch] Skipping gift recipient ${logLabel} (${eventData.user_name || 'Anonymous'})`);
     return;
   }
 
-  const tierLevel = subTierLevel(eventData.tier);
-  let minutes = config.tier1SubMinutes;
-  if (tierLevel === 2) minutes = config.tier2SubMinutes;
-  if (tierLevel === 3) minutes = config.tier3SubMinutes;
+  const adjustment = timer.getTimeAdjustment();
+  const tier = resolveTier(eventData);
+  const tierLevel = subTierLevel(tier);
+  const duration = Math.max(1, eventData.duration_months || 1);
+  const minutes = minutesForSubTier(config, tier) * duration;
 
   const adjustedMinutes = minutes * adjustment;
   const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
-
   const userName = eventData.user_name || 'Anonymous';
-  const monthsSuffix =
-    eventData.cumulative_months != null ? `, ${eventData.cumulative_months} months` : '';
-  const adjustmentSuffix = adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : '';
+  const months = eventData.cumulative_months != null ? `, ${eventData.cumulative_months} months` : '';
+  const durationLabel = duration > 1 ? ` x${duration} months` : '';
 
   timer.addTime(
     adjustedMs,
     source,
-    `${userName} (Tier ${tierLevel}${monthsSuffix})${adjustmentSuffix}`,
+    `${userName} (Tier ${tierLevel}${months}${durationLabel})${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
     true
   );
-  console.log(
-    `[Twitch] ${logLabel} from ${userName} (Tier ${tierLevel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`
-  );
+  console.log(`[Twitch] ${logLabel} from ${userName} (Tier ${tierLevel}${durationLabel}) → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
 }
 
 // ── Process incoming events ───────────────────────────────────
@@ -178,31 +195,33 @@ function handleEvent(state, timer, eventType, eventData) {
 
   switch (eventType) {
     case 'channel.subscribe': {
-      applySubTime(state, timer, eventData, { source: 'Subscription', logLabel: 'Sub' });
+      applySubTime(config, timer, eventData, 'Subscription', 'Sub');
       break;
     }
 
     case 'channel.subscription.message': {
-      applySubTime(state, timer, eventData, { source: 'Resub', logLabel: 'Resub' });
+      applySubTime(config, timer, eventData, 'Resub', 'Resub');
       break;
     }
 
     case 'channel.subscription.gift': {
       const total = eventData.total || 1;
       const userName = eventData.user_name || 'Anonymous';
-      const minutes = config.giftedSubMinutes * total;
+      const tier = resolveTier(eventData);
+      const tierLevel = subTierLevel(tier);
+      const minutesPerSub = tier != null ? minutesForSubTier(config, tier) : config.giftedSubMinutes;
+      const minutes = minutesPerSub * total;
 
-      // Apply intelligent adjustment
       const adjustedMinutes = minutes * adjustment;
       const adjustedMs = Math.round(adjustedMinutes * 60 * 1000);
 
       timer.addTime(
         adjustedMs,
         'Gifted Subs',
-        `${userName} gifted ${total} sub${total > 1 ? 's' : ''}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
+        `${userName} gifted ${total} Tier ${tierLevel} sub${total > 1 ? 's' : ''}${adjustment !== 1.0 ? ` [${adjustment.toFixed(2)}x]` : ''}`,
         true
       );
-      console.log(`[Twitch] ${userName} gifted ${total} subs → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
+      console.log(`[Twitch] ${userName} gifted ${total} Tier ${tierLevel} subs → +${adjustedMinutes.toFixed(1)}min (${adjustment.toFixed(2)}x)`);
       break;
     }
 
@@ -305,6 +324,10 @@ async function connectTwitch(state, timer, setStatus) {
       case 'session_reconnect': {
         const newUrl = msg.payload.session.reconnect_url;
         console.log('[Twitch] Reconnect requested. New URL:', newUrl);
+        if (!isAllowedReconnectUrl(newUrl)) {
+          console.warn('[Twitch] Ignoring reconnect with untrusted URL:', newUrl);
+          break;
+        }
         // Connect to new URL before closing old one
         const oldWs = ws;
         ws = new WebSocket(newUrl);

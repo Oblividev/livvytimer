@@ -4,7 +4,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
-const { loadState, saveState, updateConfig } = require('./config');
+const { loadState, saveState, updateConfig, getCurrencySymbol } = require('./config');
 const { createTimer } = require('./timer');
 const { connectTwitch, disconnectTwitch, handleEvent } = require('./twitch');
 const { connectStreamlabs, disconnectStreamlabs, handleDonation } = require('./streamlabs');
@@ -161,13 +161,7 @@ io.on('connection', (socket) => {
       hardCapMs: state.config.hardCapMs,
       hardCapBlockEvents: state.config.hardCapBlockEvents,
     });
-
-    if (updates.hardCapMs !== undefined) {
-      console.log('[Hard Cap] Set to:', updates.hardCapMs ? `${Math.floor(updates.hardCapMs / 60000)}min` : 'disabled');
-    }
-    if (updates.hardCapBlockEvents !== undefined) {
-      console.log('[Hard Cap] Block events at cap:', updates.hardCapBlockEvents);
-    }
+    console.log('[Hard Cap] Updated:', updates);
   });
 
   // ── Test Events ────────────────────────────────────────────────
@@ -195,12 +189,14 @@ io.on('connection', (socket) => {
 
   socket.on('test:giftedSubs', (data) => {
     const total = data.total || 1;
+    const tier = data.tier || '1000';
     const userName = data.userName || 'TestUser';
     handleEvent(state, timer, 'channel.subscription.gift', {
       total: total,
+      tier: tier,
       user_name: userName,
     });
-    console.log(`[Test] Simulated ${total} gifted sub(s) from ${userName}`);
+    console.log(`[Test] Simulated ${total} Tier ${tier === '1000' ? '1' : tier === '2000' ? '2' : '3'} gifted sub(s) from ${userName}`);
   });
 
   socket.on('test:bits', (data) => {
@@ -216,16 +212,18 @@ io.on('connection', (socket) => {
   socket.on('test:donation', (data) => {
     const amount = parseFloat(data.amount) || 1.0;
     const userName = data.userName || 'TestUser';
+    const currency = state.config.donationCurrency || 'USD';
+    const symbol = getCurrencySymbol(currency);
     handleDonation(state, timer, {
       type: 'donation',
       message: [{
         name: userName,
         amount: amount,
-        currency: 'GBP',
-        formatted_amount: `GBP ${amount.toFixed(2)}`,
+        currency,
+        formatted_amount: `${currency} ${amount.toFixed(2)}`,
       }],
     });
-    console.log(`[Test] Simulated £${amount.toFixed(2)} donation from ${userName}`);
+    console.log(`[Test] Simulated ${symbol}${amount.toFixed(2)} donation from ${userName}`);
   });
 
   socket.on('disconnect', () => {
@@ -261,7 +259,8 @@ process.on('SIGTERM', shutdown);
 
 // ── Start server ──────────────────────────────────────────────
 server.listen(PORT, () => {
-  console.log(`\n  ✿ Livvy Timer is running!`);
+  const appTitle = state.config.appTitle || 'Subathon Timer';
+  console.log(`\n  ${appTitle} is running!`);
   console.log(`  ├─ Overlay:  http://localhost:${PORT}/overlay`);
   console.log(`  ├─ Admin:    http://localhost:${PORT}/admin`);
   console.log(`  └─ Port:     ${PORT}\n`);
