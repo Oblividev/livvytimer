@@ -67,6 +67,12 @@ const streamlabsStatusEl = document.getElementById('streamlabsStatus');
 const eventLog = document.getElementById('eventLog');
 const btnClearLog = document.getElementById('btnClearLog');
 
+// Advanced panel
+const advancedToggle = document.getElementById('advancedToggle');
+const advancedPanel = document.getElementById('advancedPanel');
+const advancedBadge = document.getElementById('advancedBadge');
+const ADVANCED_STORAGE_KEY = 'livvyTimerAdminAdvancedOpen';
+
 // ── State ─────────────────────────────────────────────────
 let currentState = { remainingMs: 0, isRunning: false, isPaused: false };
 let targetTimeMs = null;
@@ -210,15 +216,21 @@ function updateTargetStatus() {
   
   // Color code the adjustment
   if (adjustment > 1.0) {
-    targetAdjustment.className = 'target-value boost';
+    targetAdjustment.className = 'limit-value boost';
   } else if (adjustment < 1.0) {
-    targetAdjustment.className = 'target-value reduce';
+    targetAdjustment.className = 'limit-value reduce';
   } else {
-    targetAdjustment.className = 'target-value';
+    targetAdjustment.className = 'limit-value';
   }
 }
 
+function updateAdvancedBadge() {
+  advancedBadge.hidden = !(hardCapMs && hardCapMs > 0);
+}
+
 function updateCapStatus() {
+  updateAdvancedBadge();
+
   if (!hardCapMs || hardCapMs <= 0) {
     capStatus.style.display = 'none';
     return;
@@ -237,16 +249,16 @@ function updateCapStatus() {
 
   if (remainingToCap <= 0) {
     capStatusText.textContent = 'AT CAP';
-    capStatusText.className = 'target-value reduce';
+    capStatusText.className = 'limit-value reduce';
   } else if (remainingToCap < 60000) { // Less than 1 minute
     capStatusText.textContent = 'Near Cap';
-    capStatusText.className = 'target-value reduce';
+    capStatusText.className = 'limit-value reduce';
   } else if (percentToCap >= 90) {
     capStatusText.textContent = `${percentToCap.toFixed(0)}% Full`;
-    capStatusText.className = 'target-value reduce';
+    capStatusText.className = 'limit-value reduce';
   } else {
     capStatusText.textContent = 'Active';
-    capStatusText.className = 'target-value';
+    capStatusText.className = 'limit-value';
   }
 }
 
@@ -428,10 +440,32 @@ btnSaveConfig.addEventListener('click', () => {
   btnSaveConfig.textContent = 'Saved!';
   btnSaveConfig.classList.add('saved');
   setTimeout(() => {
-    btnSaveConfig.textContent = 'Save Configuration';
+    btnSaveConfig.textContent = 'Save Rewards';
     btnSaveConfig.classList.remove('saved');
   }, 2000);
 });
+
+// Advanced panel toggle
+function setAdvancedOpen(open) {
+  advancedPanel.hidden = !open;
+  advancedToggle.setAttribute('aria-expanded', String(open));
+  advancedToggle.classList.toggle('open', open);
+  try {
+    localStorage.setItem(ADVANCED_STORAGE_KEY, open ? '1' : '0');
+  } catch {
+    // ignore storage errors
+  }
+}
+
+advancedToggle.addEventListener('click', () => {
+  setAdvancedOpen(advancedPanel.hidden);
+});
+
+try {
+  setAdvancedOpen(localStorage.getItem(ADVANCED_STORAGE_KEY) === '1');
+} catch {
+  setAdvancedOpen(false);
+}
 
 // Target time handlers
 btnSetTarget.addEventListener('click', () => {

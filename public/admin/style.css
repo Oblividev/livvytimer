@@ -493,44 +493,171 @@ body {
   letter-spacing: 1px;
 }
 
-/* ── Target Status ───────────────────────────────────────── */
+/* ── Settings Card ───────────────────────────────────────── */
 
-.target-status {
-  margin-top: 16px;
-  padding-top: 16px;
+.settings-card .card-desc {
+  margin-bottom: 20px;
+}
+
+.settings-group {
+  padding-top: 20px;
   border-top: 1px solid var(--border-subtle);
+}
+
+.settings-group:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.settings-group-title {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--soft-lavender);
+  margin-bottom: 6px;
+}
+
+.settings-group-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.settings-advanced {
+  padding-top: 16px;
+}
+
+/* ── Advanced Toggle ─────────────────────────────────────── */
+
+.advanced-toggle {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.advanced-toggle:hover {
+  border-color: var(--border-focus);
+  background: var(--bg-card-hover);
+}
+
+.advanced-toggle-left {
+  display: flex;
+  align-items: center;
   gap: 10px;
 }
 
-.target-info {
+.advanced-toggle-label {
+  color: var(--text-dim);
+}
+
+.advanced-badge {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sakura-pink);
+  background: rgba(255, 183, 197, 0.1);
+  border: 1px solid rgba(255, 183, 197, 0.25);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.advanced-badge[hidden] {
+  display: none;
+}
+
+.advanced-toggle-icon {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-dim);
+  border-bottom: 2px solid var(--text-dim);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+  margin-top: -4px;
+}
+
+.advanced-toggle.open .advanced-toggle-icon {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+}
+
+.advanced-panel {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.advanced-panel[hidden] {
+  display: none;
+}
+
+.advanced-section-title {
+  font-family: 'DotGothic16', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--sakura-blue);
+  margin-bottom: 6px;
+}
+
+.advanced-section .card-subtitle {
+  margin-top: 12px;
+}
+
+/* ── Limit Status ────────────────────────────────────────── */
+
+.limit-status {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.limit-info {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.target-label {
+.limit-label {
   font-family: 'DotGothic16', monospace;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-dim);
 }
 
-.target-value {
+.limit-value {
   font-family: 'Zen Maru Gothic', sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
 }
 
-.target-value.boost {
+.limit-value.boost {
   color: var(--green);
 }
 
-.target-value.reduce {
+.limit-value.reduce {
   color: var(--sakura-pink);
 }
 
